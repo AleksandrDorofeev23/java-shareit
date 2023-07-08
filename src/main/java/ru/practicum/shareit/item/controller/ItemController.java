@@ -16,24 +16,26 @@ public class ItemController {
 
     private final ItemService itemService;
 
+    private final String USER_ID_HEADER = "X-Sharer-User-Id";
+
     @GetMapping("/{id}")
     public ItemDto getById(@PathVariable long id) {
         return itemService.getById(id);
     }
 
     @GetMapping()
-    public Collection<ItemDto> getAllByUser(@RequestHeader("X-Sharer-User-Id") long id) {
+    public Collection<ItemDto> getAllByUser(@RequestHeader(USER_ID_HEADER) long id) {
         return itemService.getAllByUser(id);
     }
 
     @PostMapping()
-    public ItemDto create(@Valid @RequestBody ItemDto itemDto, @RequestHeader("X-Sharer-User-Id") long id) {
+    public ItemDto create(@Valid @RequestBody ItemDto itemDto, @RequestHeader(USER_ID_HEADER) long id) {
         return itemService.create(itemDto, id);
     }
 
     @PatchMapping("/{id}")
     public ItemDto update(@RequestBody Item item, @PathVariable long id,
-                          @RequestHeader("X-Sharer-User-Id") long userId) {
+                          @RequestHeader(USER_ID_HEADER) long userId) {
         return itemService.update(item, id, userId);
     }
 
