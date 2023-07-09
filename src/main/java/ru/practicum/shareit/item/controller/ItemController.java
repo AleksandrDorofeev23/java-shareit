@@ -17,7 +17,7 @@ public class ItemController {
 
     private final ItemService itemService;
 
-    private  final static String userIdHeader = "X-Sharer-User-Id";
+    private static final String userIdHeader = "X-Sharer-User-Id";
 
     @GetMapping("/{id}")
     public ItemDto getById(@PathVariable long id) {
