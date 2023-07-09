@@ -133,12 +133,12 @@ class UserServiceImplTest {
 
     @Test
     void testUpdate() {
-        when(userStorage.update((User) any(), anyLong())).thenReturn(new User(1L, "Name", "jane.doe@example.org"));
-        UserDto actualUpdateResult = userServiceImpl.update(new User(1L, "Name", "jane.doe@example.org"), 1L);
+        when(userStorage.update((UserDto) any(), anyLong())).thenReturn(new User(1L, "Name", "jane.doe@example.org"));
+        UserDto actualUpdateResult = userServiceImpl.update(new UserDto(1L, "Name", "jane.doe@example.org"), 1L);
         assertEquals("jane.doe@example.org", actualUpdateResult.getEmail());
         assertEquals("Name", actualUpdateResult.getName());
         assertEquals(1L, actualUpdateResult.getId());
-        verify(userStorage).update((User) any(), anyLong());
+        verify(userStorage).update((UserDto) any(), anyLong());
     }
 
     @Test
@@ -147,12 +147,12 @@ class UserServiceImplTest {
         when(user.getEmail()).thenReturn("jane.doe@example.org");
         when(user.getName()).thenReturn("Name");
         when(user.getId()).thenReturn(1L);
-        when(userStorage.update((User) any(), anyLong())).thenReturn(user);
-        UserDto actualUpdateResult = userServiceImpl.update(new User(1L, "Name", "jane.doe@example.org"), 1L);
+        when(userStorage.update((UserDto) any(), anyLong())).thenReturn(user);
+        UserDto actualUpdateResult = userServiceImpl.update(new UserDto(1L, "Name", "jane.doe@example.org"), 1L);
         assertEquals("jane.doe@example.org", actualUpdateResult.getEmail());
         assertEquals("Name", actualUpdateResult.getName());
         assertEquals(1L, actualUpdateResult.getId());
-        verify(userStorage).update((User) any(), anyLong());
+        verify(userStorage).update((UserDto) any(), anyLong());
         verify(user).getEmail();
         verify(user).getName();
         verify(user).getId();

@@ -1,6 +1,7 @@
 package ru.practicum.shareit.user.storage;
 
 import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.model.dto.UserDto;
 
 import java.util.Collection;
 
@@ -12,7 +13,7 @@ public interface UserStorage {
 
     User create(User user);
 
-    User update(User user, long id);
+    User update(UserDto userDto, long id);
 
     void deleteById(long id);
 }

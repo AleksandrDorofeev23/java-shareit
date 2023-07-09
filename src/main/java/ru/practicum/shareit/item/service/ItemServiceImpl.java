@@ -47,20 +47,20 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDto update(Item item, long itemId, long id) {
+    public ItemDto update(ItemDto itemDto, long itemId, long id) {
         userStorage.getById(id);
         Item oldItem = itemStorage.getById(itemId);
         if (oldItem.getOwner().getId() != id) {
             throw new NotFoundException("Пользователю не принадлежит этот предмет");
         }
-        if (item.getName() != null) {
-            oldItem.setName(item.getName());
+        if (itemDto.getName() != null) {
+            oldItem.setName(itemDto.getName());
         }
-        if (item.getDescription() != null) {
-            oldItem.setDescription(item.getDescription());
+        if (itemDto.getDescription() != null) {
+            oldItem.setDescription(itemDto.getDescription());
         }
-        if (item.getAvailable() != null) {
-            oldItem.setAvailable(item.getAvailable());
+        if (itemDto.getAvailable() != null) {
+            oldItem.setAvailable(itemDto.getAvailable());
         }
         return toItemDto(itemStorage.update(oldItem));
     }
@@ -77,7 +77,7 @@ public class ItemServiceImpl implements ItemService {
         }
         return itemStorage.getAllByUser()
                 .stream()
-                .filter(a -> a.getDescription().toLowerCase().contains(text.toLowerCase()) && a.getAvailable())
+                .filter(a -> a.getAvailable() && (a.getDescription().toLowerCase().contains(text.toLowerCase()) || a.getName().toLowerCase().contains(text.toLowerCase())))
                 .map(ItemMapper::toItemDto)
                 .collect(Collectors.toList());
     }

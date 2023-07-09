@@ -258,7 +258,7 @@ class ItemServiceImplTest {
         User owner2 = new User(1L, "Name", "jane.doe@example.org");
 
         ItemDto actualUpdateResult = itemServiceImpl.update(
-                new Item(1L, "Name", "The characteristics of someone or something", true, owner2, new ItemRequest()), 1L, 1L);
+                new ItemDto(1L, "Name", "The characteristics of someone or something", true), 1L, 1L);
         assertTrue(actualUpdateResult.getAvailable());
         assertEquals("Name", actualUpdateResult.getName());
         assertEquals(1L, actualUpdateResult.getId());
@@ -283,7 +283,7 @@ class ItemServiceImplTest {
 
         assertThrows(NotFoundException.class,
                 () -> itemServiceImpl.update(
-                        new Item(1L, "Name", "The characteristics of someone or something", true, owner2, new ItemRequest()), 1L,
+                        new ItemDto(1L, "Name", "The characteristics of someone or something", true), 1L,
                         1L));
         verify(userStorage).getById(anyLong());
     }
@@ -304,7 +304,7 @@ class ItemServiceImplTest {
         User owner1 = new User(1L, "Name", "jane.doe@example.org");
 
         ItemDto actualUpdateResult = itemServiceImpl.update(
-                new Item(1L, "Name", "The characteristics of someone or something", true, owner1, new ItemRequest()), 1L, 1L);
+                new ItemDto(1L, "Name", "The characteristics of someone or something", true), 1L, 1L);
         assertTrue(actualUpdateResult.getAvailable());
         assertEquals("Name", actualUpdateResult.getName());
         assertEquals(1L, actualUpdateResult.getId());
@@ -330,7 +330,7 @@ class ItemServiceImplTest {
 
         assertThrows(NotFoundException.class,
                 () -> itemServiceImpl.update(
-                        new Item(1L, "Name", "The characteristics of someone or something", true, owner1, new ItemRequest()), 1L,
+                        new ItemDto(1L, "Name", "The characteristics of someone or something", true), 1L,
                         1L));
         verify(itemStorage).getById(anyLong());
         verify(userStorage).getById(anyLong());
@@ -354,7 +354,7 @@ class ItemServiceImplTest {
         User owner = new User(1L, "Name", "jane.doe@example.org");
 
         ItemDto actualUpdateResult = itemServiceImpl.update(
-                new Item(1L, "Name", "The characteristics of someone or something", true, owner, new ItemRequest()), 1L, 1L);
+                new ItemDto(1L, "Name", "The characteristics of someone or something", true), 1L, 1L);
         assertTrue(actualUpdateResult.getAvailable());
         assertEquals("Name", actualUpdateResult.getName());
         assertEquals(1L, actualUpdateResult.getId());
@@ -386,7 +386,7 @@ class ItemServiceImplTest {
 
         assertThrows(NotFoundException.class,
                 () -> itemServiceImpl.update(
-                        new Item(1L, "Name", "The characteristics of someone or something", true, owner, new ItemRequest()), 1L,
+                        new ItemDto(1L, "Name", "The characteristics of someone or something", true), 1L,
                         1L));
         verify(itemStorage).getById(anyLong());
         verify(item).getOwner();

@@ -13,6 +13,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.practicum.shareit.user.exceptions.NotFoundException;
 import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.model.dto.UserDto;
 
 @ContextConfiguration(classes = {UserStorageImpl.class})
 @ExtendWith(SpringExtension.class)
@@ -74,7 +75,7 @@ class UserStorageImplTest {
     @Test
     void testUpdate() {
         assertThrows(NotFoundException.class,
-                () -> userStorageImpl.update(new User(1L, "Name", "jane.doe@example.org"), 1L));
+                () -> userStorageImpl.update(new UserDto(1L, "Name", "jane.doe@example.org"), 1L));
     }
 
     @Test

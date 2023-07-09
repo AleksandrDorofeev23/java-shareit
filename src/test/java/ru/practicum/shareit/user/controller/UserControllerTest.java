@@ -79,13 +79,13 @@ class UserControllerTest {
     @Test
     void testUpdate() {
         UserStorageImpl userStorageImpl = mock(UserStorageImpl.class);
-        when(userStorageImpl.update((User) any(), anyLong())).thenReturn(new User(1L, "Name", "jane.doe@example.org"));
+        when(userStorageImpl.update((UserDto) any(), anyLong())).thenReturn(new User(1L, "Name", "jane.doe@example.org"));
         UserController userController = new UserController(new UserServiceImpl(userStorageImpl));
-        UserDto actualUpdateResult = userController.update(new User(1L, "Name", "jane.doe@example.org"), 1L);
+        UserDto actualUpdateResult = userController.update(new UserDto(1L, "Name", "jane.doe@example.org"), 1L);
         assertEquals("jane.doe@example.org", actualUpdateResult.getEmail());
         assertEquals("Name", actualUpdateResult.getName());
         assertEquals(1L, actualUpdateResult.getId());
-        verify(userStorageImpl).update((User) any(), anyLong());
+        verify(userStorageImpl).update((UserDto) any(), anyLong());
     }
 
     @Test

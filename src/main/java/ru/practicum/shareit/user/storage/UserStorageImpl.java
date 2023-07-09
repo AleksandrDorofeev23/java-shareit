@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 import ru.practicum.shareit.user.exceptions.NotFoundException;
 import ru.practicum.shareit.user.exceptions.ValidException;
 import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.model.dto.UserDto;
 
 import java.util.*;
 
@@ -39,20 +40,20 @@ public class UserStorageImpl implements UserStorage {
     }
 
     @Override
-    public User update(User user, long id) {
+    public User update(UserDto userDto, long id) {
         if (!users.containsKey(id)) {
             throw new NotFoundException("Такого пользователя нет");
         }
         User oldUser = users.get(id);
-        if (user.getName() != null) {
-            oldUser.setName(user.getName());
+        if (userDto.getName() != null) {
+            oldUser.setName(userDto.getName());
         }
-        if (user.getEmail() != null) {
-            if (!user.getEmail().equals(oldUser.getEmail())) {
+        if (userDto.getEmail() != null) {
+            if (!userDto.getEmail().equals(oldUser.getEmail())) {
                 if (users.values()
                         .stream()
-                        .noneMatch(a -> a.getEmail().equalsIgnoreCase(user.getEmail()))) {
-                    oldUser.setEmail(user.getEmail());
+                        .noneMatch(a -> a.getEmail().equalsIgnoreCase(userDto.getEmail()))) {
+                    oldUser.setEmail(userDto.getEmail());
                 } else {
                     throw new ValidException("Пользователь с такой почтой уже существует");
                 }
