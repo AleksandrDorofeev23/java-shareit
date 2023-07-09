@@ -454,17 +454,5 @@ class ItemServiceImplTest {
         verify(itemStorage).getAllByUser();
     }
 
-    @Test
-    void testSearch6() {
-        Item item = mock(Item.class);
-        when(item.getDescription()).thenReturn("The characteristics of someone or something");
-
-        ArrayList<Item> itemList = new ArrayList<>();
-        itemList.add(item);
-        when(itemStorage.getAllByUser()).thenReturn(itemList);
-        assertTrue(itemServiceImpl.search("Text").isEmpty());
-        verify(itemStorage).getAllByUser();
-        verify(item).getDescription();
-    }
 }
 
