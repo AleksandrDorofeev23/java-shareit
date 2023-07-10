@@ -1,8 +1,8 @@
 package ru.practicum.shareit.user.storage;
 
 import org.springframework.stereotype.Component;
+import ru.practicum.shareit.user.exceptions.EmailException;
 import ru.practicum.shareit.user.exceptions.NotFoundException;
-import ru.practicum.shareit.user.exceptions.ValidException;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.model.dto.UserDto;
 
@@ -32,7 +32,7 @@ public class UserStorageImpl implements UserStorage {
         if (users.values()
                 .stream()
                 .anyMatch(a -> a.getEmail().equalsIgnoreCase(user.getEmail()))) {
-            throw new ValidException("Пользователь с такой почтой уже существует");
+            throw new EmailException("Пользователь с такой почтой уже существует");
         }
         user.setId(++id);
         users.put(user.getId(), user);
@@ -55,7 +55,7 @@ public class UserStorageImpl implements UserStorage {
                         .noneMatch(a -> a.getEmail().equalsIgnoreCase(userDto.getEmail()))) {
                     oldUser.setEmail(userDto.getEmail());
                 } else {
-                    throw new ValidException("Пользователь с такой почтой уже существует");
+                    throw new EmailException("Пользователь с такой почтой уже существует");
                 }
             }
         }
