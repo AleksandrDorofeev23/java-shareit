@@ -6,7 +6,7 @@ import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.booking.model.dto.BookingDto;
 import ru.practicum.shareit.booking.repository.BookingRepository;
-import ru.practicum.shareit.booking.utils.BookingMapper;
+import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
@@ -14,15 +14,15 @@ import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.model.dto.CommentDto;
 import ru.practicum.shareit.item.model.dto.ItemPlusDto;
-import ru.practicum.shareit.item.utils.CommentMapper;
-import ru.practicum.shareit.item.utils.ItemMapper;
+import ru.practicum.shareit.item.mapper.CommentMapper;
+import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.dto.ItemDto;
 import ru.practicum.shareit.exceptions.ValidException;
 import ru.practicum.shareit.user.model.User;
 
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.user.service.UserService;
-import ru.practicum.shareit.user.utils.UserMapper;
+import ru.practicum.shareit.user.mapper.UserMapper;
 
 import java.time.LocalDateTime;
 import java.util.*;

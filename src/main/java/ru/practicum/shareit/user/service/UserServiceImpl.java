@@ -8,7 +8,7 @@ import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.model.dto.UserDto;
 import ru.practicum.shareit.user.repository.UserRepository;
-import ru.practicum.shareit.user.utils.UserMapper;
+import ru.practicum.shareit.user.mapper.UserMapper;
 
 import java.util.Collection;
 import java.util.Optional;

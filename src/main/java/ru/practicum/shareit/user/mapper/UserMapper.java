@@ -1,4 +1,4 @@
-package ru.practicum.shareit.user.utils;
+package ru.practicum.shareit.user.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;
@@ -11,6 +11,5 @@ public interface UserMapper {
     UserDto toUserDto(User user);
 
     User toUser(UserDto userDto);
-
 
 }
