@@ -1,11 +1,8 @@
 package ru.practicum.shareit.user.controller;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyLong;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,11 +20,8 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.model.dto.UserDto;
 import ru.practicum.shareit.user.service.UserService;
-import ru.practicum.shareit.user.service.UserServiceImpl;
-import ru.practicum.shareit.user.storage.UserStorageImpl;
 
 @ContextConfiguration(classes = {UserController.class})
 @ExtendWith(SpringExtension.class)
@@ -77,26 +71,38 @@ class UserControllerTest {
     }
 
     @Test
-    void testUpdate() {
-        UserStorageImpl userStorageImpl = mock(UserStorageImpl.class);
-        when(userStorageImpl.update((UserDto) any(), anyLong())).thenReturn(new User(1L, "Name", "jane.doe@example.org"));
-        UserController userController = new UserController(new UserServiceImpl(userStorageImpl));
-        UserDto actualUpdateResult = userController.update(new UserDto(1L, "Name", "jane.doe@example.org"), 1L);
-        assertEquals("jane.doe@example.org", actualUpdateResult.getEmail());
-        assertEquals("Name", actualUpdateResult.getName());
-        assertEquals(1L, actualUpdateResult.getId());
-        verify(userStorageImpl).update((UserDto) any(), anyLong());
+    void testUpdate() throws Exception {
+        when(userService.update((UserDto) any(), anyLong())).thenReturn(new UserDto(1L, "Name", "jane.doe@example.org"));
+
+        UserDto userDto = new UserDto();
+        userDto.setEmail("jane.doe@example.org");
+        userDto.setId(1L);
+        userDto.setName("Name");
+        String content = (new ObjectMapper()).writeValueAsString(userDto);
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.patch("/users/{id}", 1L)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(content);
+        MockMvcBuilders.standaloneSetup(userController)
+                .build()
+                .perform(requestBuilder)
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
+                .andExpect(MockMvcResultMatchers.content()
+                        .string("{\"id\":1,\"name\":\"Name\",\"email\":\"jane.doe@example.org\"}"));
     }
 
     @Test
     void testCreate() throws Exception {
         when(userService.getAll()).thenReturn(new ArrayList<>());
-        MockHttpServletRequestBuilder contentTypeResult = MockMvcRequestBuilders.get("/users")
-                .contentType(MediaType.APPLICATION_JSON);
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        MockHttpServletRequestBuilder requestBuilder = contentTypeResult
-                .content(objectMapper.writeValueAsString(new UserDto(1L, "Name", "jane.doe@example.org")));
+        UserDto userDto = new UserDto();
+        userDto.setEmail("jane.doe@example.org");
+        userDto.setId(1L);
+        userDto.setName("Name");
+        String content = (new ObjectMapper()).writeValueAsString(userDto);
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(content);
         MockMvcBuilders.standaloneSetup(userController)
                 .build()
                 .perform(requestBuilder)
