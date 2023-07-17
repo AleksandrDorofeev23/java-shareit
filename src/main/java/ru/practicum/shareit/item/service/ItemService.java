@@ -10,7 +10,7 @@ public interface ItemService {
 
     ItemPlusDto getById(long id, long userId);
 
-    Collection<ItemPlusDto> getAllByUser(long id);
+    Collection<ItemPlusDto> getAllByUser(int from, int size, long id);
 
     ItemDto create(ItemDto itemDto, long id);
 
@@ -18,7 +18,7 @@ public interface ItemService {
 
     void deleteById(long id);
 
-    Collection<ItemDto> search(String text);
+    Collection<ItemDto> search(int from, int size, String text);
 
     CommentDto createComment(long id, long userId, CommentDto commentDto);
 }
