@@ -89,7 +89,7 @@ class UserServiceImplTest {
         user1.setName("Name");
         Optional<User> ofResult = Optional.of(user1);
         when(userRepository.save((User) any())).thenReturn(user);
-        when(userRepository.findByEmail((String) any())).thenReturn(ofResult);
+        when(userRepository.findByEmailContainingIgnoreCase((String) any())).thenReturn(ofResult);
 
         User user2 = new User();
         user2.setEmail("jane.doe@example.org");
@@ -98,7 +98,7 @@ class UserServiceImplTest {
         when(userMapper.toUser((UserDto) any())).thenReturn(user2);
         assertThrows(EmailException.class, () -> userServiceImpl.create(new UserDto(1L, "Name", "jane.doe@example.org")));
         verify(userRepository).save((User) any());
-        verify(userRepository).findByEmail((String) any());
+        verify(userRepository).findByEmailContainingIgnoreCase((String) any());
         verify(userMapper).toUser((UserDto) any());
     }
 
@@ -115,11 +115,11 @@ class UserServiceImplTest {
         user1.setName("Name");
         Optional<User> ofResult = Optional.of(user1);
         when(userRepository.save((User) any())).thenReturn(user);
-        when(userRepository.findByEmail((String) any())).thenReturn(ofResult);
+        when(userRepository.findByEmailContainingIgnoreCase((String) any())).thenReturn(ofResult);
         when(userMapper.toUser((UserDto) any()))
                 .thenThrow(new EmailException("Пользователь с такой почтой уже существует."));
         assertThrows(EmailException.class, () -> userServiceImpl.create(new UserDto(1L, "Name", "jane.doe@example.org")));
-        verify(userRepository).findByEmail((String) any());
+        verify(userRepository).findByEmailContainingIgnoreCase((String) any());
         verify(userMapper).toUser((UserDto) any());
     }
 
@@ -130,7 +130,7 @@ class UserServiceImplTest {
         user.setId(1L);
         user.setName("Name");
         when(userRepository.save((User) any())).thenReturn(user);
-        when(userRepository.findByEmail((String) any())).thenReturn(Optional.empty());
+        when(userRepository.findByEmailContainingIgnoreCase((String) any())).thenReturn(Optional.empty());
 
         User user1 = new User();
         user1.setEmail("jane.doe@example.org");
@@ -142,7 +142,7 @@ class UserServiceImplTest {
         when(userMapper.toUser((UserDto) any())).thenReturn(user1);
         assertSame(userDto, userServiceImpl.create(new UserDto(1L, "Name", "jane.doe@example.org")));
         verify(userRepository).save((User) any());
-        verify(userRepository).findByEmail((String) any());
+        verify(userRepository).findByEmailContainingIgnoreCase((String) any());
         verify(userMapper).toUser((UserDto) any());
         verify(userMapper).toUserDto((User) any());
     }
@@ -154,7 +154,7 @@ class UserServiceImplTest {
         user.setId(1L);
         user.setName("Name");
         when(userRepository.save((User) any())).thenReturn(user);
-        when(userRepository.findByEmail((String) any())).thenReturn(Optional.empty());
+        when(userRepository.findByEmailContainingIgnoreCase((String) any())).thenReturn(Optional.empty());
 
         User user1 = new User();
         user1.setEmail("jane.doe@example.org");
@@ -164,7 +164,7 @@ class UserServiceImplTest {
         when(userMapper.toUser((UserDto) any())).thenReturn(user1);
         assertThrows(EmailException.class, () -> userServiceImpl.create(new UserDto(1L, "Name", "jane.doe@example.org")));
         verify(userRepository).save((User) any());
-        verify(userRepository).findByEmail((String) any());
+        verify(userRepository).findByEmailContainingIgnoreCase((String) any());
         verify(userMapper).toUser((UserDto) any());
         verify(userMapper).toUserDto((User) any());
     }
@@ -188,7 +188,7 @@ class UserServiceImplTest {
         user2.setName("Name");
         Optional<User> ofResult1 = Optional.of(user2);
         when(userRepository.save((User) any())).thenReturn(user1);
-        when(userRepository.findByEmail((String) any())).thenReturn(ofResult1);
+        when(userRepository.findByEmailContainingIgnoreCase((String) any())).thenReturn(ofResult1);
         when(userRepository.findById((Long) any())).thenReturn(ofResult);
         UserDto userDto = new UserDto(1L, "Name", "jane.doe@example.org");
 
@@ -196,7 +196,7 @@ class UserServiceImplTest {
         assertSame(userDto, userServiceImpl.update(new UserDto(1L, "Name", "jane.doe@example.org"), 1L));
         verify(userRepository).save((User) any());
         verify(userRepository).findById((Long) any());
-        verify(userRepository).findByEmail((String) any());
+        verify(userRepository).findByEmailContainingIgnoreCase((String) any());
         verify(userMapper).toUserDto((User) any());
     }
 
@@ -219,14 +219,14 @@ class UserServiceImplTest {
         user2.setName("Name");
         Optional<User> ofResult1 = Optional.of(user2);
         when(userRepository.save((User) any())).thenReturn(user1);
-        when(userRepository.findByEmail((String) any())).thenReturn(ofResult1);
+        when(userRepository.findByEmailContainingIgnoreCase((String) any())).thenReturn(ofResult1);
         when(userRepository.findById((Long) any())).thenReturn(ofResult);
         when(userMapper.toUserDto((User) any())).thenThrow(new EmailException("foo"));
         assertThrows(EmailException.class,
                 () -> userServiceImpl.update(new UserDto(1L, "Name", "jane.doe@example.org"), 1L));
         verify(userRepository).save((User) any());
         verify(userRepository).findById((Long) any());
-        verify(userRepository).findByEmail((String) any());
+        verify(userRepository).findByEmailContainingIgnoreCase((String) any());
         verify(userMapper).toUserDto((User) any());
     }
 
@@ -252,13 +252,13 @@ class UserServiceImplTest {
         user2.setName("Name");
         Optional<User> ofResult1 = Optional.of(user2);
         when(userRepository.save((User) any())).thenReturn(user1);
-        when(userRepository.findByEmail((String) any())).thenReturn(ofResult1);
+        when(userRepository.findByEmailContainingIgnoreCase((String) any())).thenReturn(ofResult1);
         when(userRepository.findById((Long) any())).thenReturn(ofResult);
         when(userMapper.toUserDto((User) any())).thenReturn(new UserDto(1L, "Name", "jane.doe@example.org"));
         assertThrows(EmailException.class,
                 () -> userServiceImpl.update(new UserDto(1L, "Name", "jane.doe@example.org"), 1L));
         verify(userRepository).findById((Long) any());
-        verify(userRepository).findByEmail((String) any());
+        verify(userRepository).findByEmailContainingIgnoreCase((String) any());
         verify(user2).getId();
         verify(user2).setEmail((String) any());
         verify(user2).setId(anyLong());
@@ -278,7 +278,7 @@ class UserServiceImplTest {
         user1.setId(1L);
         user1.setName("Name");
         when(userRepository.save((User) any())).thenReturn(user1);
-        when(userRepository.findByEmail((String) any())).thenReturn(Optional.empty());
+        when(userRepository.findByEmailContainingIgnoreCase((String) any())).thenReturn(Optional.empty());
         when(userRepository.findById((Long) any())).thenReturn(ofResult);
         User user2 = mock(User.class);
         when(user2.getId()).thenReturn(1L);
@@ -294,7 +294,7 @@ class UserServiceImplTest {
         assertSame(userDto, userServiceImpl.update(new UserDto(1L, "Name", "jane.doe@example.org"), 1L));
         verify(userRepository).save((User) any());
         verify(userRepository).findById((Long) any());
-        verify(userRepository).findByEmail((String) any());
+        verify(userRepository).findByEmailContainingIgnoreCase((String) any());
         verify(user2).setEmail((String) any());
         verify(user2).setId(anyLong());
         verify(user2).setName((String) any());
@@ -317,7 +317,7 @@ class UserServiceImplTest {
         user1.setName("Name");
         Optional<User> ofResult = Optional.of(user1);
         when(userRepository.save((User) any())).thenReturn(user);
-        when(userRepository.findByEmail((String) any())).thenReturn(ofResult);
+        when(userRepository.findByEmailContainingIgnoreCase((String) any())).thenReturn(ofResult);
         when(userRepository.findById((Long) any())).thenReturn(Optional.empty());
         when(userMapper.toUserDto((User) any())).thenReturn(new UserDto(1L, "Name", "jane.doe@example.org"));
         assertThrows(NotFoundException.class,
@@ -350,7 +350,7 @@ class UserServiceImplTest {
         user2.setName("Name");
         Optional<User> ofResult1 = Optional.of(user2);
         when(userRepository.save((User) any())).thenReturn(user1);
-        when(userRepository.findByEmail((String) any())).thenReturn(ofResult1);
+        when(userRepository.findByEmailContainingIgnoreCase((String) any())).thenReturn(ofResult1);
         when(userRepository.findById((Long) any())).thenReturn(ofResult);
         UserDto userDto = new UserDto(1L, "Name", "jane.doe@example.org");
 
