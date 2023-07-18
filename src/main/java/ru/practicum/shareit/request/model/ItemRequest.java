@@ -11,7 +11,7 @@ import java.util.List;
 
 @Data
 @Entity
-@Table(name = "REQUESTS", schema = "PUBLIC")
+@Table(name = "requests", schema = "PUBLIC")
 public class ItemRequest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
