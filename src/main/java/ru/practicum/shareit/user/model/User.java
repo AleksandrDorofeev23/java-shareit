@@ -8,7 +8,7 @@ import javax.persistence.*;
 
 @Data
 @Entity
-@Table(name = "users", schema = "PUBLIC")
+@Table(name = "users")
 @AllArgsConstructor
 @NoArgsConstructor
 public class User {
