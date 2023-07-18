@@ -42,7 +42,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto create(UserDto userDto) {
         User user;
-        Optional<User> oldUser = userRepository.findByEmailContainingIgnoreCase(userDto.getEmail());
+        Optional<User> oldUser = userRepository.findByEmail(userDto.getEmail());
         user = userRepository.save(userMapper.toUser(userDto));
         if (oldUser.isPresent()) {
             throw new EmailException("Пользователь с такой почтой уже существует.");
@@ -58,7 +58,7 @@ public class UserServiceImpl implements UserService {
             oldUser.setName(userDto.getName());
         }
         if (userDto.getEmail() != null) {
-            Optional<User> oldUserEmail = userRepository.findByEmailContainingIgnoreCase(userDto.getEmail());
+            Optional<User> oldUserEmail = userRepository.findByEmail(userDto.getEmail());
             if (oldUserEmail.isEmpty() || oldUser.getId() == oldUserEmail.get().getId()) {
                 oldUser.setEmail(userDto.getEmail());
             } else {
