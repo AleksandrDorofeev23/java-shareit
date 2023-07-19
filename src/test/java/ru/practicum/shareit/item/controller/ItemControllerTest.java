@@ -1,17 +1,6 @@
 package ru.practicum.shareit.item.controller;
 
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyLong;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.time.LocalDateTime;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +19,12 @@ import ru.practicum.shareit.item.model.dto.ItemDto;
 import ru.practicum.shareit.item.model.dto.ItemPlusDto;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.user.model.dto.UserDto;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashSet;
+
+import static org.mockito.Mockito.*;
 
 @ContextConfiguration(classes = {ItemController.class})
 @ExtendWith(SpringExtension.class)
@@ -69,8 +64,10 @@ class ItemControllerTest {
 
     @Test
     void testGetAllByUser() throws Exception {
-        when(itemService.getAllByUser(anyLong())).thenReturn(new ArrayList<>());
-        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/items")
+        when(itemService.getAllByUser(anyInt(), anyInt(), anyLong())).thenReturn(new ArrayList<>());
+        MockHttpServletRequestBuilder getResult = MockMvcRequestBuilders.get("/items");
+        MockHttpServletRequestBuilder paramResult = getResult.param("from", String.valueOf(1));
+        MockHttpServletRequestBuilder requestBuilder = paramResult.param("size", String.valueOf(1))
                 .header("X-Sharer-User-Id", 1L);
         MockMvcBuilders.standaloneSetup(itemController)
                 .build()
@@ -89,6 +86,7 @@ class ItemControllerTest {
         itemDto.setDescription("The characteristics of someone or something");
         itemDto.setId(1L);
         itemDto.setName("Name");
+        itemDto.setRequestId(1L);
         String content = (new ObjectMapper()).writeValueAsString(itemDto);
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.patch("/items/{id}", 1L)
                 .header("X-Sharer-User-Id", 1L)
@@ -100,13 +98,15 @@ class ItemControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
                 .andExpect(MockMvcResultMatchers.content()
-                        .string("{\"id\":0,\"name\":null,\"description\":null,\"available\":null}"));
+                        .string("{\"id\":0,\"name\":null,\"description\":null,\"available\":null,\"requestId\":null}"));
     }
 
     @Test
     void testSearch() throws Exception {
-        when(itemService.search((String) any())).thenReturn(new ArrayList<>());
-        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/items/search").param("text", "foo");
+        when(itemService.search(anyInt(), anyInt(), (String) any())).thenReturn(new ArrayList<>());
+        MockHttpServletRequestBuilder getResult = MockMvcRequestBuilders.get("/items/search");
+        MockHttpServletRequestBuilder paramResult = getResult.param("from", String.valueOf(1));
+        MockHttpServletRequestBuilder requestBuilder = paramResult.param("size", String.valueOf(1)).param("text", "foo");
         MockMvcBuilders.standaloneSetup(itemController)
                 .build()
                 .perform(requestBuilder)
@@ -138,13 +138,14 @@ class ItemControllerTest {
 
     @Test
     void testCreate() throws Exception {
-        when(itemService.getAllByUser(anyLong())).thenReturn(new ArrayList<>());
+        when(itemService.getAllByUser(anyInt(), anyInt(), anyLong())).thenReturn(new ArrayList<>());
 
         ItemDto itemDto = new ItemDto();
         itemDto.setAvailable(true);
         itemDto.setDescription("The characteristics of someone or something");
         itemDto.setId(1L);
         itemDto.setName("Name");
+        itemDto.setRequestId(1L);
         String content = (new ObjectMapper()).writeValueAsString(itemDto);
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/items")
                 .header("X-Sharer-User-Id", 1L)

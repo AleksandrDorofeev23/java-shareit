@@ -1,34 +1,14 @@
 package ru.practicum.shareit.item.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyLong;
-import static org.mockito.Mockito.atLeast;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
-import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.booking.model.dto.BookingDto;
 import ru.practicum.shareit.booking.repository.BookingRepository;
@@ -43,10 +23,21 @@ import ru.practicum.shareit.item.model.dto.ItemDto;
 import ru.practicum.shareit.item.model.dto.ItemPlusDto;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.model.dto.UserDto;
 import ru.practicum.shareit.user.service.UserService;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @ContextConfiguration(classes = {ItemServiceImpl.class})
 @ExtendWith(SpringExtension.class)
@@ -69,6 +60,9 @@ class ItemServiceImplTest {
     @MockBean
     private ItemRepository itemRepository;
 
+    @MockBean
+    private ItemRequestRepository itemRequestRepository;
+
     @Autowired
     private ItemServiceImpl itemServiceImpl;
 
@@ -85,12 +79,25 @@ class ItemServiceImplTest {
         user.setId(1L);
         user.setName("Name");
 
+        User user1 = new User();
+        user1.setEmail("jane.doe@example.org");
+        user1.setId(1L);
+        user1.setName("Name");
+
+        ItemRequest itemRequest = new ItemRequest();
+        itemRequest.setCreated(LocalDateTime.of(1, 1, 1, 1, 1));
+        itemRequest.setDescription("The characteristics of someone or something");
+        itemRequest.setId(1L);
+        itemRequest.setItems(new ArrayList<>());
+        itemRequest.setRequester(user1);
+
         Item item = new Item();
         item.setAvailable(true);
         item.setDescription("The characteristics of someone or something");
         item.setId(1L);
         item.setName("Name");
         item.setOwner(user);
+        item.setRequest(itemRequest);
         Optional<Item> ofResult = Optional.of(item);
         when(itemRepository.findById((Long) any())).thenReturn(ofResult);
 
@@ -125,12 +132,25 @@ class ItemServiceImplTest {
         user.setId(1L);
         user.setName("Name");
 
+        User user1 = new User();
+        user1.setEmail("jane.doe@example.org");
+        user1.setId(1L);
+        user1.setName("Name");
+
+        ItemRequest itemRequest = new ItemRequest();
+        itemRequest.setCreated(LocalDateTime.of(1, 1, 1, 1, 1));
+        itemRequest.setDescription("The characteristics of someone or something");
+        itemRequest.setId(1L);
+        itemRequest.setItems(new ArrayList<>());
+        itemRequest.setRequester(user1);
+
         Item item = new Item();
         item.setAvailable(true);
         item.setDescription("The characteristics of someone or something");
         item.setId(1L);
         item.setName("Name");
         item.setOwner(user);
+        item.setRequest(itemRequest);
         Optional<Item> ofResult = Optional.of(item);
         when(itemRepository.findById((Long) any())).thenReturn(ofResult);
 
@@ -176,244 +196,23 @@ class ItemServiceImplTest {
     }
 
     @Test
-    void testGetById4() {
-        User user = new User();
-        user.setEmail("jane.doe@example.org");
-        user.setId(1L);
-        user.setName("Name");
-
-        Item item = new Item();
-        item.setAvailable(true);
-        item.setDescription("The characteristics of someone or something");
-        item.setId(1L);
-        item.setName("Name");
-        item.setOwner(user);
-        Optional<Item> ofResult = Optional.of(item);
-        when(itemRepository.findById((Long) any())).thenReturn(ofResult);
-        ItemPlusDto itemPlusDto = mock(ItemPlusDto.class);
-        when(itemPlusDto.getOwner()).thenReturn(new UserDto(2L, "Name", "jane.doe@example.org"));
-        doNothing().when(itemPlusDto).setAvailable((Boolean) any());
-        doNothing().when(itemPlusDto).setComments((Set<CommentDto>) any());
-        doNothing().when(itemPlusDto).setDescription((String) any());
-        doNothing().when(itemPlusDto).setId(anyLong());
-        doNothing().when(itemPlusDto).setLastBooking((BookingDto) any());
-        doNothing().when(itemPlusDto).setName((String) any());
-        doNothing().when(itemPlusDto).setNextBooking((BookingDto) any());
-        doNothing().when(itemPlusDto).setOwner((UserDto) any());
-        itemPlusDto.setAvailable(true);
-        itemPlusDto.setComments(new HashSet<>());
-        itemPlusDto.setDescription("The characteristics of someone or something");
-        itemPlusDto.setId(1L);
-        itemPlusDto.setLastBooking(new BookingDto());
-        itemPlusDto.setName("Name");
-        itemPlusDto.setNextBooking(new BookingDto());
-        itemPlusDto.setOwner(new UserDto(1L, "Name", "jane.doe@example.org"));
-        when(itemMapper.toItemPlusDto((Item) any())).thenReturn(itemPlusDto);
-        when(bookingRepository.findByItem_IdAndStatusOrderByStartDesc(anyLong(), (Status) any()))
-                .thenReturn(new ArrayList<>());
-        when(commentRepository.findByItem_IdOrderByCreatedDesc(anyLong())).thenReturn(new HashSet<>());
-        itemServiceImpl.getById(1L, 1L);
-        verify(itemRepository).findById((Long) any());
-        verify(itemMapper).toItemPlusDto((Item) any());
-        verify(itemPlusDto).getOwner();
-        verify(itemPlusDto).setAvailable((Boolean) any());
-        verify(itemPlusDto, atLeast(1)).setComments((Set<CommentDto>) any());
-        verify(itemPlusDto).setDescription((String) any());
-        verify(itemPlusDto).setId(anyLong());
-        verify(itemPlusDto).setLastBooking((BookingDto) any());
-        verify(itemPlusDto).setName((String) any());
-        verify(itemPlusDto).setNextBooking((BookingDto) any());
-        verify(itemPlusDto).setOwner((UserDto) any());
-        verify(bookingRepository).findByItem_IdAndStatusOrderByStartDesc(anyLong(), (Status) any());
-        verify(commentRepository).findByItem_IdOrderByCreatedDesc(anyLong());
-    }
-
-    @Test
-    void testGetById5() {
-        User user = new User();
-        user.setEmail("jane.doe@example.org");
-        user.setId(1L);
-        user.setName("Name");
-
-        Item item = new Item();
-        item.setAvailable(true);
-        item.setDescription("The characteristics of someone or something");
-        item.setId(1L);
-        item.setName("Name");
-        item.setOwner(user);
-        Optional<Item> ofResult = Optional.of(item);
-        when(itemRepository.findById((Long) any())).thenReturn(ofResult);
-        ItemPlusDto itemPlusDto = mock(ItemPlusDto.class);
-        when(itemPlusDto.getId()).thenReturn(1L);
-        when(itemPlusDto.getOwner()).thenReturn(new UserDto(1L, "Name", "jane.doe@example.org"));
-        doNothing().when(itemPlusDto).setAvailable((Boolean) any());
-        doNothing().when(itemPlusDto).setComments((Set<CommentDto>) any());
-        doNothing().when(itemPlusDto).setDescription((String) any());
-        doNothing().when(itemPlusDto).setId(anyLong());
-        doNothing().when(itemPlusDto).setLastBooking((BookingDto) any());
-        doNothing().when(itemPlusDto).setName((String) any());
-        doNothing().when(itemPlusDto).setNextBooking((BookingDto) any());
-        doNothing().when(itemPlusDto).setOwner((UserDto) any());
-        itemPlusDto.setAvailable(true);
-        itemPlusDto.setComments(new HashSet<>());
-        itemPlusDto.setDescription("The characteristics of someone or something");
-        itemPlusDto.setId(1L);
-        itemPlusDto.setLastBooking(new BookingDto());
-        itemPlusDto.setName("Name");
-        itemPlusDto.setNextBooking(new BookingDto());
-        itemPlusDto.setOwner(new UserDto(1L, "Name", "jane.doe@example.org"));
-        when(itemMapper.toItemPlusDto((Item) any())).thenReturn(itemPlusDto);
-        when(bookingMapper.toBookingDto((Booking) any())).thenReturn(new BookingDto());
-
-        User user1 = new User();
-        user1.setEmail("jane.doe@example.org");
-        user1.setId(1L);
-        user1.setName("Name");
-
-        User user2 = new User();
-        user2.setEmail("jane.doe@example.org");
-        user2.setId(1L);
-        user2.setName("Name");
-
-        Item item1 = new Item();
-        item1.setAvailable(true);
-        item1.setDescription("The characteristics of someone or something");
-        item1.setId(1L);
-        item1.setName("Name");
-        item1.setOwner(user2);
-
-        Booking booking = new Booking();
-        booking.setBooker(user1);
-        booking.setEnd(LocalDateTime.of(1, 1, 1, 1, 1));
-        booking.setId(1L);
-        booking.setItem(item1);
-        booking.setStart(LocalDateTime.of(1, 1, 1, 1, 1));
-        booking.setStatus(Status.WAITING);
-
-        ArrayList<Booking> bookingList = new ArrayList<>();
-        bookingList.add(booking);
-        when(bookingRepository.findByItem_IdAndStatusOrderByStartDesc(anyLong(), (Status) any())).thenReturn(bookingList);
-        when(commentRepository.findByItem_IdOrderByCreatedDesc(anyLong())).thenReturn(new HashSet<>());
-        itemServiceImpl.getById(1L, 1L);
-        verify(itemRepository).findById((Long) any());
-        verify(itemMapper).toItemPlusDto((Item) any());
-        verify(itemPlusDto, atLeast(1)).getId();
-        verify(itemPlusDto).getOwner();
-        verify(itemPlusDto).setAvailable((Boolean) any());
-        verify(itemPlusDto, atLeast(1)).setComments((Set<CommentDto>) any());
-        verify(itemPlusDto).setDescription((String) any());
-        verify(itemPlusDto).setId(anyLong());
-        verify(itemPlusDto, atLeast(1)).setLastBooking((BookingDto) any());
-        verify(itemPlusDto).setName((String) any());
-        verify(itemPlusDto, atLeast(1)).setNextBooking((BookingDto) any());
-        verify(itemPlusDto).setOwner((UserDto) any());
-        verify(bookingMapper).toBookingDto((Booking) any());
-        verify(bookingRepository).findByItem_IdAndStatusOrderByStartDesc(anyLong(), (Status) any());
-        verify(commentRepository).findByItem_IdOrderByCreatedDesc(anyLong());
-    }
-
-    @Test
-    void testGetById6() {
-        User user = new User();
-        user.setEmail("jane.doe@example.org");
-        user.setId(1L);
-        user.setName("Name");
-
-        Item item = new Item();
-        item.setAvailable(true);
-        item.setDescription("The characteristics of someone or something");
-        item.setId(1L);
-        item.setName("Name");
-        item.setOwner(user);
-        Optional<Item> ofResult = Optional.of(item);
-        when(itemRepository.findById((Long) any())).thenReturn(ofResult);
-        ItemPlusDto itemPlusDto = mock(ItemPlusDto.class);
-        when(itemPlusDto.getId()).thenThrow(new RuntimeException());
-        when(itemPlusDto.getOwner()).thenReturn(new UserDto(1L, "Name", "jane.doe@example.org"));
-        doNothing().when(itemPlusDto).setAvailable((Boolean) any());
-        doNothing().when(itemPlusDto).setComments((Set<CommentDto>) any());
-        doNothing().when(itemPlusDto).setDescription((String) any());
-        doNothing().when(itemPlusDto).setId(anyLong());
-        doNothing().when(itemPlusDto).setLastBooking((BookingDto) any());
-        doNothing().when(itemPlusDto).setName((String) any());
-        doNothing().when(itemPlusDto).setNextBooking((BookingDto) any());
-        doNothing().when(itemPlusDto).setOwner((UserDto) any());
-        itemPlusDto.setAvailable(true);
-        itemPlusDto.setComments(new HashSet<>());
-        itemPlusDto.setDescription("The characteristics of someone or something");
-        itemPlusDto.setId(1L);
-        itemPlusDto.setLastBooking(new BookingDto());
-        itemPlusDto.setName("Name");
-        itemPlusDto.setNextBooking(new BookingDto());
-        itemPlusDto.setOwner(new UserDto(1L, "Name", "jane.doe@example.org"));
-        when(itemMapper.toItemPlusDto((Item) any())).thenReturn(itemPlusDto);
-        when(bookingMapper.toBookingDto((Booking) any())).thenReturn(new BookingDto());
-
-        User user1 = new User();
-        user1.setEmail("jane.doe@example.org");
-        user1.setId(1L);
-        user1.setName("Name");
-
-        User user2 = new User();
-        user2.setEmail("jane.doe@example.org");
-        user2.setId(1L);
-        user2.setName("Name");
-
-        Item item1 = new Item();
-        item1.setAvailable(true);
-        item1.setDescription("The characteristics of someone or something");
-        item1.setId(1L);
-        item1.setName("Name");
-        item1.setOwner(user2);
-
-        Booking booking = new Booking();
-        booking.setBooker(user1);
-        booking.setEnd(LocalDateTime.of(1, 1, 1, 1, 1));
-        booking.setId(1L);
-        booking.setItem(item1);
-        booking.setStart(LocalDateTime.of(1, 1, 1, 1, 1));
-        booking.setStatus(Status.WAITING);
-
-        ArrayList<Booking> bookingList = new ArrayList<>();
-        bookingList.add(booking);
-        when(bookingRepository.findByItem_IdAndStatusOrderByStartDesc(anyLong(), (Status) any())).thenReturn(bookingList);
-        when(commentRepository.findByItem_IdOrderByCreatedDesc(anyLong())).thenReturn(new HashSet<>());
-        assertThrows(RuntimeException.class, () -> itemServiceImpl.getById(1L, 1L));
-        verify(itemRepository).findById((Long) any());
-        verify(itemMapper).toItemPlusDto((Item) any());
-        verify(itemPlusDto).getId();
-        verify(itemPlusDto).getOwner();
-        verify(itemPlusDto).setAvailable((Boolean) any());
-        verify(itemPlusDto).setComments((Set<CommentDto>) any());
-        verify(itemPlusDto).setDescription((String) any());
-        verify(itemPlusDto).setId(anyLong());
-        verify(itemPlusDto).setLastBooking((BookingDto) any());
-        verify(itemPlusDto).setName((String) any());
-        verify(itemPlusDto).setNextBooking((BookingDto) any());
-        verify(itemPlusDto).setOwner((UserDto) any());
-        verify(bookingMapper).toBookingDto((Booking) any());
-        verify(bookingRepository).findByItem_IdAndStatusOrderByStartDesc(anyLong(), (Status) any());
-        verify(commentRepository).findByItem_IdOrderByCreatedDesc(anyLong());
-    }
-
-    @Test
     void testGetAllByUser() {
-        when(itemRepository.findAll()).thenReturn(new ArrayList<>());
+        when(itemRepository.findAllByOwnerId((Pageable) any(), anyLong())).thenReturn(new PageImpl<>(new ArrayList<>()));
         when(bookingRepository.findAllByItemOwnerIdOrderByStartDesc(anyLong())).thenReturn(new ArrayList<>());
         when(commentRepository.findAllByItemIdInOrderByCreatedDesc((List<Long>) any())).thenReturn(new HashSet<>());
-        assertTrue(itemServiceImpl.getAllByUser(1L).isEmpty());
-        verify(itemRepository).findAll();
+        assertTrue(itemServiceImpl.getAllByUser(1, 3, 1L).isEmpty());
+        verify(itemRepository).findAllByOwnerId((Pageable) any(), anyLong());
         verify(bookingRepository).findAllByItemOwnerIdOrderByStartDesc(anyLong());
         verify(commentRepository).findAllByItemIdInOrderByCreatedDesc((List<Long>) any());
     }
 
     @Test
     void testGetAllByUser2() {
-        when(itemRepository.findAll()).thenReturn(new ArrayList<>());
+        when(itemRepository.findAllByOwnerId((Pageable) any(), anyLong())).thenReturn(new PageImpl<>(new ArrayList<>()));
         when(bookingRepository.findAllByItemOwnerIdOrderByStartDesc(anyLong())).thenReturn(new ArrayList<>());
         when(commentRepository.findAllByItemIdInOrderByCreatedDesc((List<Long>) any())).thenThrow(new RuntimeException());
-        assertThrows(RuntimeException.class, () -> itemServiceImpl.getAllByUser(1L));
-        verify(itemRepository).findAll();
+        assertThrows(RuntimeException.class, () -> itemServiceImpl.getAllByUser(1, 3, 1L));
+        verify(itemRepository).findAllByOwnerId((Pageable) any(), anyLong());
         verify(bookingRepository).findAllByItemOwnerIdOrderByStartDesc(anyLong());
         verify(commentRepository).findAllByItemIdInOrderByCreatedDesc((List<Long>) any());
     }
@@ -425,16 +224,30 @@ class ItemServiceImplTest {
         user.setId(1L);
         user.setName("Name");
 
+        User user1 = new User();
+        user1.setEmail("jane.doe@example.org");
+        user1.setId(1L);
+        user1.setName("Name");
+
+        ItemRequest itemRequest = new ItemRequest();
+        itemRequest.setCreated(LocalDateTime.of(1, 1, 1, 1, 1));
+        itemRequest.setDescription("The characteristics of someone or something");
+        itemRequest.setId(1L);
+        itemRequest.setItems(new ArrayList<>());
+        itemRequest.setRequester(user1);
+
         Item item = new Item();
         item.setAvailable(true);
         item.setDescription("The characteristics of someone or something");
         item.setId(1L);
         item.setName("Name");
         item.setOwner(user);
+        item.setRequest(itemRequest);
 
         ArrayList<Item> itemList = new ArrayList<>();
         itemList.add(item);
-        when(itemRepository.findAll()).thenReturn(itemList);
+        PageImpl<Item> pageImpl = new PageImpl<>(itemList);
+        when(itemRepository.findAllByOwnerId((Pageable) any(), anyLong())).thenReturn(pageImpl);
 
         ItemPlusDto itemPlusDto = new ItemPlusDto();
         itemPlusDto.setAvailable(true);
@@ -448,8 +261,8 @@ class ItemServiceImplTest {
         when(itemMapper.toItemPlusDto((Item) any())).thenReturn(itemPlusDto);
         when(bookingRepository.findAllByItemOwnerIdOrderByStartDesc(anyLong())).thenReturn(new ArrayList<>());
         when(commentRepository.findAllByItemIdInOrderByCreatedDesc((List<Long>) any())).thenReturn(new HashSet<>());
-        assertEquals(1, itemServiceImpl.getAllByUser(1L).size());
-        verify(itemRepository).findAll();
+        assertEquals(1, itemServiceImpl.getAllByUser(1, 3, 1L).size());
+        verify(itemRepository).findAllByOwnerId((Pageable) any(), anyLong());
         verify(itemMapper).toItemPlusDto((Item) any());
         verify(bookingRepository).findAllByItemOwnerIdOrderByStartDesc(anyLong());
         verify(commentRepository).findAllByItemIdInOrderByCreatedDesc((List<Long>) any());
@@ -462,29 +275,56 @@ class ItemServiceImplTest {
         user.setId(1L);
         user.setName("Name");
 
+        User user1 = new User();
+        user1.setEmail("jane.doe@example.org");
+        user1.setId(1L);
+        user1.setName("Name");
+
+        ItemRequest itemRequest = new ItemRequest();
+        itemRequest.setCreated(LocalDateTime.of(1, 1, 1, 1, 1));
+        itemRequest.setDescription("The characteristics of someone or something");
+        itemRequest.setId(1L);
+        itemRequest.setItems(new ArrayList<>());
+        itemRequest.setRequester(user1);
+
         Item item = new Item();
         item.setAvailable(true);
         item.setDescription("The characteristics of someone or something");
         item.setId(1L);
         item.setName("Name");
         item.setOwner(user);
+        item.setRequest(itemRequest);
 
-        User user1 = new User();
-        user1.setEmail("john.smith@example.org");
-        user1.setId(2L);
-        user1.setName("ru.practicum.shareit.user.model.User");
+        User user2 = new User();
+        user2.setEmail("john.smith@example.org");
+        user2.setId(2L);
+        user2.setName("ru.practicum.shareit.user.model.User");
+
+        User user3 = new User();
+        user3.setEmail("john.smith@example.org");
+        user3.setId(2L);
+        user3.setName("ru.practicum.shareit.user.model.User");
+
+        ItemRequest itemRequest1 = new ItemRequest();
+        itemRequest1.setCreated(LocalDateTime.of(1, 1, 1, 1, 1));
+        itemRequest1.setDescription("Description");
+        itemRequest1.setId(2L);
+        itemRequest1.setItems(new ArrayList<>());
+        itemRequest1.setRequester(user3);
 
         Item item1 = new Item();
         item1.setAvailable(false);
         item1.setDescription("Description");
         item1.setId(2L);
         item1.setName("ru.practicum.shareit.item.model.Item");
-        item1.setOwner(user1);
+        item1.setOwner(user2);
+        item1.setRequest(itemRequest1);
 
         ArrayList<Item> itemList = new ArrayList<>();
         itemList.add(item1);
         itemList.add(item);
-        when(itemRepository.findAll()).thenReturn(itemList);
+        PageImpl<Item> pageImpl = new PageImpl<>(itemList);
+        when(itemRepository.findAllByOwnerId((Pageable) any(), anyLong())).thenReturn(pageImpl);
 
         ItemPlusDto itemPlusDto = new ItemPlusDto();
         itemPlusDto.setAvailable(true);
@@ -498,188 +338,9 @@ class ItemServiceImplTest {
         when(itemMapper.toItemPlusDto((Item) any())).thenReturn(itemPlusDto);
         when(bookingRepository.findAllByItemOwnerIdOrderByStartDesc(anyLong())).thenReturn(new ArrayList<>());
         when(commentRepository.findAllByItemIdInOrderByCreatedDesc((List<Long>) any())).thenReturn(new HashSet<>());
-        assertEquals(1, itemServiceImpl.getAllByUser(1L).size());
-        verify(itemRepository).findAll();
-        verify(itemMapper).toItemPlusDto((Item) any());
-        verify(bookingRepository).findAllByItemOwnerIdOrderByStartDesc(anyLong());
-        verify(commentRepository).findAllByItemIdInOrderByCreatedDesc((List<Long>) any());
-    }
-
-    @Test
-    void testGetAllByUser5() {
-        User user = new User();
-        user.setEmail("jane.doe@example.org");
-        user.setId(1L);
-        user.setName("Name");
-
-        User user1 = new User();
-        user1.setEmail("jane.doe@example.org");
-        user1.setId(1L);
-        user1.setName("Name");
-        Item item = mock(Item.class);
-        when(item.getOwner()).thenReturn(user1);
-        doNothing().when(item).setAvailable((Boolean) any());
-        doNothing().when(item).setDescription((String) any());
-        doNothing().when(item).setId(anyLong());
-        doNothing().when(item).setName((String) any());
-        doNothing().when(item).setOwner((User) any());
-        item.setAvailable(true);
-        item.setDescription("The characteristics of someone or something");
-        item.setId(1L);
-        item.setName("Name");
-        item.setOwner(user);
-
-        ArrayList<Item> itemList = new ArrayList<>();
-        itemList.add(item);
-        when(itemRepository.findAll()).thenReturn(itemList);
-
-        ItemPlusDto itemPlusDto = new ItemPlusDto();
-        itemPlusDto.setAvailable(true);
-        itemPlusDto.setComments(new HashSet<>());
-        itemPlusDto.setDescription("The characteristics of someone or something");
-        itemPlusDto.setId(1L);
-        itemPlusDto.setLastBooking(new BookingDto());
-        itemPlusDto.setName("Name");
-        itemPlusDto.setNextBooking(new BookingDto());
-        itemPlusDto.setOwner(new UserDto(1L, "Name", "jane.doe@example.org"));
-        when(itemMapper.toItemPlusDto((Item) any())).thenReturn(itemPlusDto);
-        when(bookingMapper.toBookingDto((Booking) any())).thenReturn(new BookingDto());
-
-        User user2 = new User();
-        user2.setEmail("jane.doe@example.org");
-        user2.setId(1L);
-        user2.setName("Name");
-
-        User user3 = new User();
-        user3.setEmail("jane.doe@example.org");
-        user3.setId(1L);
-        user3.setName("Name");
-
-        Item item1 = new Item();
-        item1.setAvailable(true);
-        item1.setDescription("The characteristics of someone or something");
-        item1.setId(1L);
-        item1.setName("Name");
-        item1.setOwner(user3);
-
-        Booking booking = new Booking();
-        booking.setBooker(user2);
-        booking.setEnd(LocalDateTime.of(1, 1, 1, 1, 1));
-        booking.setId(1L);
-        booking.setItem(item1);
-        booking.setStart(LocalDateTime.of(1, 1, 1, 1, 1));
-        booking.setStatus(Status.WAITING);
-
-        ArrayList<Booking> bookingList = new ArrayList<>();
-        bookingList.add(booking);
-        when(bookingRepository.findAllByItemOwnerIdOrderByStartDesc(anyLong())).thenReturn(bookingList);
-        when(commentRepository.findAllByItemIdInOrderByCreatedDesc((List<Long>) any())).thenReturn(new HashSet<>());
-        assertEquals(1, itemServiceImpl.getAllByUser(1L).size());
-        verify(itemRepository).findAll();
-        verify(item).getOwner();
-        verify(item).setAvailable((Boolean) any());
-        verify(item).setDescription((String) any());
-        verify(item).setId(anyLong());
-        verify(item).setName((String) any());
-        verify(item).setOwner((User) any());
-        verify(itemMapper).toItemPlusDto((Item) any());
-        verify(bookingMapper).toBookingDto((Booking) any());
-        verify(bookingRepository).findAllByItemOwnerIdOrderByStartDesc(anyLong());
-        verify(commentRepository).findAllByItemIdInOrderByCreatedDesc((List<Long>) any());
-    }
-
-    @Test
-    void testGetAllByUser6() {
-        User user = new User();
-        user.setEmail("jane.doe@example.org");
-        user.setId(1L);
-        user.setName("Name");
-
-        User user1 = new User();
-        user1.setEmail("jane.doe@example.org");
-        user1.setId(1L);
-        user1.setName("Name");
-        Item item = mock(Item.class);
-        when(item.getOwner()).thenReturn(user1);
-        doNothing().when(item).setAvailable((Boolean) any());
-        doNothing().when(item).setDescription((String) any());
-        doNothing().when(item).setId(anyLong());
-        doNothing().when(item).setName((String) any());
-        doNothing().when(item).setOwner((User) any());
-        item.setAvailable(true);
-        item.setDescription("The characteristics of someone or something");
-        item.setId(1L);
-        item.setName("Name");
-        item.setOwner(user);
-
-        User user2 = new User();
-        user2.setEmail("jane.doe@example.org");
-        user2.setId(1L);
-        user2.setName("Name");
-
-        Item item1 = new Item();
-        item1.setAvailable(false);
-        item1.setDescription("The characteristics of someone or something");
-        item1.setId(1L);
-        item1.setName("Name");
-        item1.setOwner(user2);
-
-        ArrayList<Item> itemList = new ArrayList<>();
-        itemList.add(item1);
-        itemList.add(item);
-        when(itemRepository.findAll()).thenReturn(itemList);
-
-        ItemPlusDto itemPlusDto = new ItemPlusDto();
-        itemPlusDto.setAvailable(true);
-        itemPlusDto.setComments(new HashSet<>());
-        itemPlusDto.setDescription("The characteristics of someone or something");
-        itemPlusDto.setId(1L);
-        itemPlusDto.setLastBooking(new BookingDto());
-        itemPlusDto.setName("Name");
-        itemPlusDto.setNextBooking(new BookingDto());
-        itemPlusDto.setOwner(new UserDto(1L, "Name", "jane.doe@example.org"));
-        when(itemMapper.toItemPlusDto((Item) any())).thenReturn(itemPlusDto);
-        when(bookingMapper.toBookingDto((Booking) any())).thenReturn(new BookingDto());
-
-        User user3 = new User();
-        user3.setEmail("jane.doe@example.org");
-        user3.setId(1L);
-        user3.setName("Name");
-
-        User user4 = new User();
-        user4.setEmail("jane.doe@example.org");
-        user4.setId(1L);
-        user4.setName("Name");
-
-        Item item2 = new Item();
-        item2.setAvailable(true);
-        item2.setDescription("The characteristics of someone or something");
-        item2.setId(1L);
-        item2.setName("Name");
-        item2.setOwner(user4);
-
-        Booking booking = new Booking();
-        booking.setBooker(user3);
-        booking.setEnd(LocalDateTime.of(1, 1, 1, 1, 1));
-        booking.setId(1L);
-        booking.setItem(item2);
-        booking.setStart(LocalDateTime.of(1, 1, 1, 1, 1));
-        booking.setStatus(Status.WAITING);
-
-        ArrayList<Booking> bookingList = new ArrayList<>();
-        bookingList.add(booking);
-        when(bookingRepository.findAllByItemOwnerIdOrderByStartDesc(anyLong())).thenReturn(bookingList);
-        when(commentRepository.findAllByItemIdInOrderByCreatedDesc((List<Long>) any())).thenReturn(new HashSet<>());
-        assertEquals(2, itemServiceImpl.getAllByUser(1L).size());
-        verify(itemRepository).findAll();
-        verify(item).getOwner();
-        verify(item).setAvailable((Boolean) any());
-        verify(item).setDescription((String) any());
-        verify(item).setId(anyLong());
-        verify(item).setName((String) any());
-        verify(item).setOwner((User) any());
+        assertEquals(2, itemServiceImpl.getAllByUser(1, 3, 1L).size());
+        verify(itemRepository).findAllByOwnerId((Pageable) any(), anyLong());
         verify(itemMapper, atLeast(1)).toItemPlusDto((Item) any());
-        verify(bookingMapper).toBookingDto((Booking) any());
         verify(bookingRepository).findAllByItemOwnerIdOrderByStartDesc(anyLong());
         verify(commentRepository).findAllByItemIdInOrderByCreatedDesc((List<Long>) any());
     }
@@ -691,35 +352,61 @@ class ItemServiceImplTest {
         user.setId(1L);
         user.setName("Name");
 
+        User user1 = new User();
+        user1.setEmail("jane.doe@example.org");
+        user1.setId(1L);
+        user1.setName("Name");
+
+        ItemRequest itemRequest = new ItemRequest();
+        itemRequest.setCreated(LocalDateTime.of(1, 1, 1, 1, 1));
+        itemRequest.setDescription("The characteristics of someone or something");
+        itemRequest.setId(1L);
+        itemRequest.setItems(new ArrayList<>());
+        itemRequest.setRequester(user1);
+
         Item item = new Item();
         item.setAvailable(true);
         item.setDescription("The characteristics of someone or something");
         item.setId(1L);
         item.setName("Name");
         item.setOwner(user);
+        item.setRequest(itemRequest);
         when(itemRepository.save((Item) any())).thenReturn(item);
         when(userService.getById(anyLong())).thenReturn(new UserDto(1L, "Name", "jane.doe@example.org"));
 
-        User user1 = new User();
-        user1.setEmail("jane.doe@example.org");
-        user1.setId(1L);
-        user1.setName("Name");
+        User user2 = new User();
+        user2.setEmail("jane.doe@example.org");
+        user2.setId(1L);
+        user2.setName("Name");
+
+        User user3 = new User();
+        user3.setEmail("jane.doe@example.org");
+        user3.setId(1L);
+        user3.setName("Name");
+
+        ItemRequest itemRequest1 = new ItemRequest();
+        itemRequest1.setCreated(LocalDateTime.of(1, 1, 1, 1, 1));
+        itemRequest1.setDescription("The characteristics of someone or something");
+        itemRequest1.setId(1L);
+        itemRequest1.setItems(new ArrayList<>());
+        itemRequest1.setRequester(user3);
 
         Item item1 = new Item();
         item1.setAvailable(true);
         item1.setDescription("The characteristics of someone or something");
         item1.setId(1L);
         item1.setName("Name");
-        item1.setOwner(user1);
+        item1.setOwner(user2);
+        item1.setRequest(itemRequest1);
         ItemDto itemDto = new ItemDto();
         when(itemMapper.toItemDto((Item) any())).thenReturn(itemDto);
         when(itemMapper.toItem((ItemDto) any())).thenReturn(item1);
 
-        User user2 = new User();
-        user2.setEmail("jane.doe@example.org");
-        user2.setId(1L);
-        user2.setName("Name");
-        when(userMapper.toUser((UserDto) any())).thenReturn(user2);
+        User user4 = new User();
+        user4.setEmail("jane.doe@example.org");
+        user4.setId(1L);
+        user4.setName("Name");
+        when(userMapper.toUser((UserDto) any())).thenReturn(user4);
         assertSame(itemDto, itemServiceImpl.create(new ItemDto(), 1L));
         verify(itemRepository).save((Item) any());
         verify(userService).getById(anyLong());
@@ -735,26 +422,52 @@ class ItemServiceImplTest {
         user.setId(1L);
         user.setName("Name");
 
+        User user1 = new User();
+        user1.setEmail("jane.doe@example.org");
+        user1.setId(1L);
+        user1.setName("Name");
+
+        ItemRequest itemRequest = new ItemRequest();
+        itemRequest.setCreated(LocalDateTime.of(1, 1, 1, 1, 1));
+        itemRequest.setDescription("The characteristics of someone or something");
+        itemRequest.setId(1L);
+        itemRequest.setItems(new ArrayList<>());
+        itemRequest.setRequester(user1);
+
         Item item = new Item();
         item.setAvailable(true);
         item.setDescription("The characteristics of someone or something");
         item.setId(1L);
         item.setName("Name");
         item.setOwner(user);
+        item.setRequest(itemRequest);
         when(itemRepository.save((Item) any())).thenReturn(item);
         when(userService.getById(anyLong())).thenReturn(new UserDto(1L, "Name", "jane.doe@example.org"));
 
-        User user1 = new User();
-        user1.setEmail("jane.doe@example.org");
-        user1.setId(1L);
-        user1.setName("Name");
+        User user2 = new User();
+        user2.setEmail("jane.doe@example.org");
+        user2.setId(1L);
+        user2.setName("Name");
+
+        User user3 = new User();
+        user3.setEmail("jane.doe@example.org");
+        user3.setId(1L);
+        user3.setName("Name");
+
+        ItemRequest itemRequest1 = new ItemRequest();
+        itemRequest1.setCreated(LocalDateTime.of(1, 1, 1, 1, 1));
+        itemRequest1.setDescription("The characteristics of someone or something");
+        itemRequest1.setId(1L);
+        itemRequest1.setItems(new ArrayList<>());
+        itemRequest1.setRequester(user3);
 
         Item item1 = new Item();
         item1.setAvailable(true);
         item1.setDescription("The characteristics of someone or something");
         item1.setId(1L);
         item1.setName("Name");
-        item1.setOwner(user1);
+        item1.setOwner(user2);
+        item1.setRequest(itemRequest1);
         when(itemMapper.toItemDto((Item) any())).thenReturn(new ItemDto());
         when(itemMapper.toItem((ItemDto) any())).thenReturn(item1);
         when(userMapper.toUser((UserDto) any())).thenThrow(new RuntimeException());
@@ -771,25 +484,51 @@ class ItemServiceImplTest {
         user.setId(1L);
         user.setName("Name");
 
+        User user1 = new User();
+        user1.setEmail("jane.doe@example.org");
+        user1.setId(1L);
+        user1.setName("Name");
+
+        ItemRequest itemRequest = new ItemRequest();
+        itemRequest.setCreated(LocalDateTime.of(1, 1, 1, 1, 1));
+        itemRequest.setDescription("The characteristics of someone or something");
+        itemRequest.setId(1L);
+        itemRequest.setItems(new ArrayList<>());
+        itemRequest.setRequester(user1);
+
         Item item = new Item();
         item.setAvailable(true);
         item.setDescription("The characteristics of someone or something");
         item.setId(1L);
         item.setName("Name");
         item.setOwner(user);
+        item.setRequest(itemRequest);
         Optional<Item> ofResult = Optional.of(item);
 
-        User user1 = new User();
-        user1.setEmail("jane.doe@example.org");
-        user1.setId(1L);
-        user1.setName("Name");
+        User user2 = new User();
+        user2.setEmail("jane.doe@example.org");
+        user2.setId(1L);
+        user2.setName("Name");
+
+        User user3 = new User();
+        user3.setEmail("jane.doe@example.org");
+        user3.setId(1L);
+        user3.setName("Name");
+
+        ItemRequest itemRequest1 = new ItemRequest();
+        itemRequest1.setCreated(LocalDateTime.of(1, 1, 1, 1, 1));
+        itemRequest1.setDescription("The characteristics of someone or something");
+        itemRequest1.setId(1L);
+        itemRequest1.setItems(new ArrayList<>());
+        itemRequest1.setRequester(user3);
 
         Item item1 = new Item();
         item1.setAvailable(true);
         item1.setDescription("The characteristics of someone or something");
         item1.setId(1L);
         item1.setName("Name");
-        item1.setOwner(user1);
+        item1.setOwner(user2);
+        item1.setRequest(itemRequest1);
         when(itemRepository.save((Item) any())).thenReturn(item1);
         when(itemRepository.findById((Long) any())).thenReturn(ofResult);
         when(userService.getById(anyLong())).thenReturn(new UserDto(1L, "Name", "jane.doe@example.org"));
@@ -809,25 +548,51 @@ class ItemServiceImplTest {
         user.setId(1L);
         user.setName("Name");
 
+        User user1 = new User();
+        user1.setEmail("jane.doe@example.org");
+        user1.setId(1L);
+        user1.setName("Name");
+
+        ItemRequest itemRequest = new ItemRequest();
+        itemRequest.setCreated(LocalDateTime.of(1, 1, 1, 1, 1));
+        itemRequest.setDescription("The characteristics of someone or something");
+        itemRequest.setId(1L);
+        itemRequest.setItems(new ArrayList<>());
+        itemRequest.setRequester(user1);
+
         Item item = new Item();
         item.setAvailable(true);
         item.setDescription("The characteristics of someone or something");
         item.setId(1L);
         item.setName("Name");
         item.setOwner(user);
+        item.setRequest(itemRequest);
         Optional<Item> ofResult = Optional.of(item);
 
-        User user1 = new User();
-        user1.setEmail("jane.doe@example.org");
-        user1.setId(1L);
-        user1.setName("Name");
+        User user2 = new User();
+        user2.setEmail("jane.doe@example.org");
+        user2.setId(1L);
+        user2.setName("Name");
+
+        User user3 = new User();
+        user3.setEmail("jane.doe@example.org");
+        user3.setId(1L);
+        user3.setName("Name");
+
+        ItemRequest itemRequest1 = new ItemRequest();
+        itemRequest1.setCreated(LocalDateTime.of(1, 1, 1, 1, 1));
+        itemRequest1.setDescription("The characteristics of someone or something");
+        itemRequest1.setId(1L);
+        itemRequest1.setItems(new ArrayList<>());
+        itemRequest1.setRequester(user3);
 
         Item item1 = new Item();
         item1.setAvailable(true);
         item1.setDescription("The characteristics of someone or something");
         item1.setId(1L);
         item1.setName("Name");
-        item1.setOwner(user1);
+        item1.setOwner(user2);
+        item1.setRequest(itemRequest1);
         when(itemRepository.save((Item) any())).thenReturn(item1);
         when(itemRepository.findById((Long) any())).thenReturn(ofResult);
         when(userService.getById(anyLong())).thenReturn(new UserDto(1L, "Name", "jane.doe@example.org"));
@@ -837,64 +602,6 @@ class ItemServiceImplTest {
         verify(itemRepository).findById((Long) any());
         verify(userService).getById(anyLong());
         verify(itemMapper).toItemDto((Item) any());
-    }
-
-    @Test
-    void testUpdate3() {
-        User user = new User();
-        user.setEmail("jane.doe@example.org");
-        user.setId(1L);
-        user.setName("Name");
-        User user1 = mock(User.class);
-        when(user1.getId()).thenReturn(-1L);
-        doNothing().when(user1).setEmail((String) any());
-        doNothing().when(user1).setId(anyLong());
-        doNothing().when(user1).setName((String) any());
-        user1.setEmail("jane.doe@example.org");
-        user1.setId(1L);
-        user1.setName("Name");
-        Item item = mock(Item.class);
-        when(item.getOwner()).thenReturn(user1);
-        doNothing().when(item).setAvailable((Boolean) any());
-        doNothing().when(item).setDescription((String) any());
-        doNothing().when(item).setId(anyLong());
-        doNothing().when(item).setName((String) any());
-        doNothing().when(item).setOwner((User) any());
-        item.setAvailable(true);
-        item.setDescription("The characteristics of someone or something");
-        item.setId(1L);
-        item.setName("Name");
-        item.setOwner(user);
-        Optional<Item> ofResult = Optional.of(item);
-
-        User user2 = new User();
-        user2.setEmail("jane.doe@example.org");
-        user2.setId(1L);
-        user2.setName("Name");
-
-        Item item1 = new Item();
-        item1.setAvailable(true);
-        item1.setDescription("The characteristics of someone or something");
-        item1.setId(1L);
-        item1.setName("Name");
-        item1.setOwner(user2);
-        when(itemRepository.save((Item) any())).thenReturn(item1);
-        when(itemRepository.findById((Long) any())).thenReturn(ofResult);
-        when(userService.getById(anyLong())).thenReturn(new UserDto(1L, "Name", "jane.doe@example.org"));
-        when(itemMapper.toItemDto((Item) any())).thenReturn(new ItemDto());
-        assertThrows(NotFoundException.class, () -> itemServiceImpl.update(new ItemDto(), 1L, 1L));
-        verify(itemRepository).findById((Long) any());
-        verify(item).getOwner();
-        verify(item).setAvailable((Boolean) any());
-        verify(item).setDescription((String) any());
-        verify(item).setId(anyLong());
-        verify(item).setName((String) any());
-        verify(item).setOwner((User) any());
-        verify(user1).getId();
-        verify(user1).setEmail((String) any());
-        verify(user1).setId(anyLong());
-        verify(user1).setName((String) any());
-        verify(userService).getById(anyLong());
     }
 
     @Test
@@ -913,9 +620,9 @@ class ItemServiceImplTest {
 
     @Test
     void testSearch() {
-        when(itemRepository.findAll()).thenReturn(new ArrayList<>());
-        assertTrue(itemServiceImpl.search("Text").isEmpty());
-        verify(itemRepository).findAll();
+        when(itemRepository.findAll((Pageable) any())).thenReturn(new PageImpl<>(new ArrayList<>()));
+        assertTrue(itemServiceImpl.search(1, 3, "Text").isEmpty());
+        verify(itemRepository).findAll((Pageable) any());
     }
 
     @Test
@@ -925,18 +632,32 @@ class ItemServiceImplTest {
         user.setId(1L);
         user.setName("Name");
 
+        User user1 = new User();
+        user1.setEmail("jane.doe@example.org");
+        user1.setId(1L);
+        user1.setName("Name");
+
+        ItemRequest itemRequest = new ItemRequest();
+        itemRequest.setCreated(LocalDateTime.of(1, 1, 1, 1, 1));
+        itemRequest.setDescription("The characteristics of someone or something");
+        itemRequest.setId(1L);
+        itemRequest.setItems(new ArrayList<>());
+        itemRequest.setRequester(user1);
+
         Item item = new Item();
         item.setAvailable(true);
         item.setDescription("The characteristics of someone or something");
         item.setId(1L);
         item.setName("Name");
         item.setOwner(user);
+        item.setRequest(itemRequest);
 
         ArrayList<Item> itemList = new ArrayList<>();
         itemList.add(item);
-        when(itemRepository.findAll()).thenReturn(itemList);
-        assertTrue(itemServiceImpl.search("Text").isEmpty());
-        verify(itemRepository).findAll();
+        PageImpl<Item> pageImpl = new PageImpl<>(itemList);
+        when(itemRepository.findAll((Pageable) any())).thenReturn(pageImpl);
+        assertTrue(itemServiceImpl.search(1, 3, "Text").isEmpty());
+        verify(itemRepository).findAll((Pageable) any());
     }
 
     @Test
@@ -946,80 +667,58 @@ class ItemServiceImplTest {
         user.setId(1L);
         user.setName("Name");
 
+        User user1 = new User();
+        user1.setEmail("jane.doe@example.org");
+        user1.setId(1L);
+        user1.setName("Name");
+
+        ItemRequest itemRequest = new ItemRequest();
+        itemRequest.setCreated(LocalDateTime.of(1, 1, 1, 1, 1));
+        itemRequest.setDescription("The characteristics of someone or something");
+        itemRequest.setId(1L);
+        itemRequest.setItems(new ArrayList<>());
+        itemRequest.setRequester(user1);
+
         Item item = new Item();
         item.setAvailable(true);
         item.setDescription("The characteristics of someone or something");
         item.setId(1L);
         item.setName("Name");
         item.setOwner(user);
+        item.setRequest(itemRequest);
 
-        User user1 = new User();
-        user1.setEmail("john.smith@example.org");
-        user1.setId(2L);
-        user1.setName("ru.practicum.shareit.user.model.User");
+        User user2 = new User();
+        user2.setEmail("john.smith@example.org");
+        user2.setId(2L);
+        user2.setName("ru.practicum.shareit.user.model.User");
+
+        User user3 = new User();
+        user3.setEmail("john.smith@example.org");
+        user3.setId(2L);
+        user3.setName("ru.practicum.shareit.user.model.User");
+
+        ItemRequest itemRequest1 = new ItemRequest();
+        itemRequest1.setCreated(LocalDateTime.of(1, 1, 1, 1, 1));
+        itemRequest1.setDescription("Description");
+        itemRequest1.setId(2L);
+        itemRequest1.setItems(new ArrayList<>());
+        itemRequest1.setRequester(user3);
 
         Item item1 = new Item();
         item1.setAvailable(false);
         item1.setDescription("Description");
         item1.setId(2L);
         item1.setName("ru.practicum.shareit.item.model.Item");
-        item1.setOwner(user1);
+        item1.setOwner(user2);
+        item1.setRequest(itemRequest1);
 
         ArrayList<Item> itemList = new ArrayList<>();
         itemList.add(item1);
         itemList.add(item);
-        when(itemRepository.findAll()).thenReturn(itemList);
-        assertTrue(itemServiceImpl.search("Text").isEmpty());
-        verify(itemRepository).findAll();
-    }
-
-    @Test
-    void testSearch4() {
-        when(itemRepository.findAll()).thenReturn(new ArrayList<>());
-        assertTrue(itemServiceImpl.search("").isEmpty());
-    }
-
-    @Test
-    void testSearch5() {
-        when(itemRepository.findAll()).thenThrow(new RuntimeException());
-        assertThrows(RuntimeException.class, () -> itemServiceImpl.search("Text"));
-        verify(itemRepository).findAll();
-    }
-
-    @Test
-    void testSearch6() {
-        User user = new User();
-        user.setEmail("jane.doe@example.org");
-        user.setId(1L);
-        user.setName("Name");
-        Item item = mock(Item.class);
-        when(item.getName()).thenThrow(new RuntimeException());
-        when(item.getDescription()).thenReturn("The characteristics of someone or something");
-        when(item.getAvailable()).thenReturn(true);
-        doNothing().when(item).setAvailable((Boolean) any());
-        doNothing().when(item).setDescription((String) any());
-        doNothing().when(item).setId(anyLong());
-        doNothing().when(item).setName((String) any());
-        doNothing().when(item).setOwner((User) any());
-        item.setAvailable(true);
-        item.setDescription("The characteristics of someone or something");
-        item.setId(1L);
-        item.setName("Name");
-        item.setOwner(user);
-
-        ArrayList<Item> itemList = new ArrayList<>();
-        itemList.add(item);
-        when(itemRepository.findAll()).thenReturn(itemList);
-        assertThrows(RuntimeException.class, () -> itemServiceImpl.search("Text"));
-        verify(itemRepository).findAll();
-        verify(item).getAvailable();
-        verify(item).getDescription();
-        verify(item).getName();
-        verify(item).setAvailable((Boolean) any());
-        verify(item).setDescription((String) any());
-        verify(item).setId(anyLong());
-        verify(item).setName((String) any());
-        verify(item).setOwner((User) any());
+        PageImpl<Item> pageImpl = new PageImpl<>(itemList);
+        when(itemRepository.findAll((Pageable) any())).thenReturn(pageImpl);
+        assertTrue(itemServiceImpl.search(1, 3, "Text").isEmpty());
+        verify(itemRepository).findAll((Pageable) any());
     }
 
     @Test
@@ -1029,46 +728,72 @@ class ItemServiceImplTest {
         user.setId(1L);
         user.setName("Name");
 
+        User user1 = new User();
+        user1.setEmail("jane.doe@example.org");
+        user1.setId(1L);
+        user1.setName("Name");
+
+        ItemRequest itemRequest = new ItemRequest();
+        itemRequest.setCreated(LocalDateTime.of(1, 1, 1, 1, 1));
+        itemRequest.setDescription("The characteristics of someone or something");
+        itemRequest.setId(1L);
+        itemRequest.setItems(new ArrayList<>());
+        itemRequest.setRequester(user1);
+
         Item item = new Item();
         item.setAvailable(true);
         item.setDescription("The characteristics of someone or something");
         item.setId(1L);
         item.setName("Name");
         item.setOwner(user);
+        item.setRequest(itemRequest);
         Optional<Item> ofResult = Optional.of(item);
         when(itemRepository.findById((Long) any())).thenReturn(ofResult);
         when(userService.getById(anyLong())).thenReturn(new UserDto(1L, "Name", "jane.doe@example.org"));
-
-        User user1 = new User();
-        user1.setEmail("jane.doe@example.org");
-        user1.setId(1L);
-        user1.setName("Name");
 
         User user2 = new User();
         user2.setEmail("jane.doe@example.org");
         user2.setId(1L);
         user2.setName("Name");
 
+        User user3 = new User();
+        user3.setEmail("jane.doe@example.org");
+        user3.setId(1L);
+        user3.setName("Name");
+
+        User user4 = new User();
+        user4.setEmail("jane.doe@example.org");
+        user4.setId(1L);
+        user4.setName("Name");
+
+        ItemRequest itemRequest1 = new ItemRequest();
+        itemRequest1.setCreated(LocalDateTime.of(1, 1, 1, 1, 1));
+        itemRequest1.setDescription("The characteristics of someone or something");
+        itemRequest1.setId(1L);
+        itemRequest1.setItems(new ArrayList<>());
+        itemRequest1.setRequester(user4);
+
         Item item1 = new Item();
         item1.setAvailable(true);
         item1.setDescription("The characteristics of someone or something");
         item1.setId(1L);
         item1.setName("Name");
-        item1.setOwner(user2);
+        item1.setOwner(user3);
+        item1.setRequest(itemRequest1);
 
         Comment comment = new Comment();
-        comment.setAuthor(user1);
+        comment.setAuthor(user2);
         comment.setCreated(LocalDateTime.of(1, 1, 1, 1, 1));
         comment.setId(1L);
         comment.setItem(item1);
         comment.setText("Text");
         when(commentMapper.toComment((CommentDto) any())).thenReturn(comment);
 
-        User user3 = new User();
-        user3.setEmail("jane.doe@example.org");
-        user3.setId(1L);
-        user3.setName("Name");
-        when(userMapper.toUser((UserDto) any())).thenReturn(user3);
+        User user5 = new User();
+        user5.setEmail("jane.doe@example.org");
+        user5.setId(1L);
+        user5.setName("Name");
+        when(userMapper.toUser((UserDto) any())).thenReturn(user5);
         when(bookingRepository.findAllByItemIdAndBookerIdAndStatusOrderByStartDesc(anyLong(), anyLong(), (Status) any()))
                 .thenReturn(Optional.of(new ArrayList<>()));
 
@@ -1093,46 +818,72 @@ class ItemServiceImplTest {
         user.setId(1L);
         user.setName("Name");
 
+        User user1 = new User();
+        user1.setEmail("jane.doe@example.org");
+        user1.setId(1L);
+        user1.setName("Name");
+
+        ItemRequest itemRequest = new ItemRequest();
+        itemRequest.setCreated(LocalDateTime.of(1, 1, 1, 1, 1));
+        itemRequest.setDescription("The characteristics of someone or something");
+        itemRequest.setId(1L);
+        itemRequest.setItems(new ArrayList<>());
+        itemRequest.setRequester(user1);
+
         Item item = new Item();
         item.setAvailable(true);
         item.setDescription("The characteristics of someone or something");
         item.setId(1L);
         item.setName("Name");
         item.setOwner(user);
+        item.setRequest(itemRequest);
         Optional<Item> ofResult = Optional.of(item);
         when(itemRepository.findById((Long) any())).thenReturn(ofResult);
         when(userService.getById(anyLong())).thenReturn(new UserDto(1L, "Name", "jane.doe@example.org"));
-
-        User user1 = new User();
-        user1.setEmail("jane.doe@example.org");
-        user1.setId(1L);
-        user1.setName("Name");
 
         User user2 = new User();
         user2.setEmail("jane.doe@example.org");
         user2.setId(1L);
         user2.setName("Name");
 
+        User user3 = new User();
+        user3.setEmail("jane.doe@example.org");
+        user3.setId(1L);
+        user3.setName("Name");
+
+        User user4 = new User();
+        user4.setEmail("jane.doe@example.org");
+        user4.setId(1L);
+        user4.setName("Name");
+
+        ItemRequest itemRequest1 = new ItemRequest();
+        itemRequest1.setCreated(LocalDateTime.of(1, 1, 1, 1, 1));
+        itemRequest1.setDescription("The characteristics of someone or something");
+        itemRequest1.setId(1L);
+        itemRequest1.setItems(new ArrayList<>());
+        itemRequest1.setRequester(user4);
+
         Item item1 = new Item();
         item1.setAvailable(true);
         item1.setDescription("The characteristics of someone or something");
         item1.setId(1L);
         item1.setName("Name");
-        item1.setOwner(user2);
+        item1.setOwner(user3);
+        item1.setRequest(itemRequest1);
 
         Comment comment = new Comment();
-        comment.setAuthor(user1);
+        comment.setAuthor(user2);
         comment.setCreated(LocalDateTime.of(1, 1, 1, 1, 1));
         comment.setId(1L);
         comment.setItem(item1);
         comment.setText("Text");
         when(commentMapper.toComment((CommentDto) any())).thenReturn(comment);
 
-        User user3 = new User();
-        user3.setEmail("jane.doe@example.org");
-        user3.setId(1L);
-        user3.setName("Name");
-        when(userMapper.toUser((UserDto) any())).thenReturn(user3);
+        User user5 = new User();
+        user5.setEmail("jane.doe@example.org");
+        user5.setId(1L);
+        user5.setName("Name");
+        when(userMapper.toUser((UserDto) any())).thenReturn(user5);
         when(bookingRepository.findAllByItemIdAndBookerIdAndStatusOrderByStartDesc(anyLong(), anyLong(), (Status) any()))
                 .thenThrow(new RuntimeException());
 

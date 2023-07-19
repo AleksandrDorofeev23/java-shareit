@@ -1,15 +1,5 @@
 package ru.practicum.shareit.booking.controller;
 
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyBoolean;
-import static org.mockito.Mockito.anyLong;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.util.ArrayList;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +15,10 @@ import ru.practicum.shareit.booking.model.dto.BookingOutDto;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.booking.service.BookingServiceImpl;
 
+import java.util.ArrayList;
+
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.mockito.Mockito.*;
 
 @ContextConfiguration(classes = {BookingController.class})
 @ExtendWith(SpringExtension.class)
@@ -37,8 +31,10 @@ class BookingControllerTest {
 
     @Test
     void testGetByUser() throws Exception {
-        when(bookingService.getByUser(anyLong(), (String) any())).thenReturn(new ArrayList<>());
-        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/bookings")
+        when(bookingService.getByUser(anyInt(), anyInt(), anyLong(), (String) any())).thenReturn(new ArrayList<>());
+        MockHttpServletRequestBuilder getResult = MockMvcRequestBuilders.get("/bookings");
+        MockHttpServletRequestBuilder paramResult = getResult.param("from", String.valueOf(1));
+        MockHttpServletRequestBuilder requestBuilder = paramResult.param("size", String.valueOf(1))
                 .param("state", "foo")
                 .header("X-Sharer-User-Id", 1L);
         MockMvcBuilders.standaloneSetup(bookingController)
@@ -51,8 +47,10 @@ class BookingControllerTest {
 
     @Test
     void testGetByOwner() throws Exception {
-        when(bookingService.getByOwner(anyLong(), (String) any())).thenReturn(new ArrayList<>());
-        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/bookings/owner")
+        when(bookingService.getByOwner(anyInt(), anyInt(), anyLong(), (String) any())).thenReturn(new ArrayList<>());
+        MockHttpServletRequestBuilder getResult = MockMvcRequestBuilders.get("/bookings/owner");
+        MockHttpServletRequestBuilder paramResult = getResult.param("from", String.valueOf(1));
+        MockHttpServletRequestBuilder requestBuilder = paramResult.param("size", String.valueOf(1))
                 .param("state", "foo")
                 .header("X-Sharer-User-Id", 1L);
         MockMvcBuilders.standaloneSetup(bookingController)
@@ -104,7 +102,7 @@ class BookingControllerTest {
 
     @Test
     void testGetByID2() throws Exception {
-        when(bookingService.getByUser(anyLong(), (String) any())).thenReturn(new ArrayList<>());
+        when(bookingService.getByUser(anyInt(), anyInt(), anyLong(), (String) any())).thenReturn(new ArrayList<>());
         when(bookingService.getById(anyLong(), anyLong())).thenReturn(new BookingOutDto());
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/bookings/{id}", "", "Uri Variables")
                 .header("X-Sharer-User-Id", 1L);
