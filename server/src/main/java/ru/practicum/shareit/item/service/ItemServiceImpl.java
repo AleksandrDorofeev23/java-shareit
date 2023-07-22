@@ -111,8 +111,9 @@ public class ItemServiceImpl implements ItemService {
                     .collect(Collectors.toSet()));
         }
         return itemPlusDtoList.stream()
-                .sorted(Comparator.comparingLong(a -> -a.getId()))
+                .sorted(Comparator.comparingLong(ItemPlusDto::getId))
                 .collect(Collectors.toList());
+
     }
 
     @Transactional
