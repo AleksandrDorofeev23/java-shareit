@@ -786,14 +786,13 @@ class ItemRequestServiceImplTest {
         user1.setEmail("jane.doe@example.org");
         user1.setId(1L);
         user1.setName("Name");
-        Optional<User> ofResult1 = Optional.of(user1);
-        when(userRepository.findById((Long) any())).thenReturn(ofResult1);
+        when(userRepository.existsById((Long) any())).thenReturn(true);
         when(itemRepository.findAllByRequestId(anyLong())).thenReturn(new ArrayList<>());
         ItemRequestDto itemRequestDto = new ItemRequestDto();
         when(itemRequestMapper.toItemRequestDto((ItemRequest) any())).thenReturn(itemRequestDto);
         assertSame(itemRequestDto, itemRequestServiceImpl.getByID(1L, 1L));
         verify(itemRequestRepository).findById((Long) any());
-        verify(userRepository).findById((Long) any());
+        verify(userRepository).existsById((Long) any());
         verify(itemRepository).findAllByRequestId(anyLong());
         verify(itemRequestMapper).toItemRequestDto((ItemRequest) any());
     }
@@ -818,13 +817,12 @@ class ItemRequestServiceImplTest {
         user1.setEmail("jane.doe@example.org");
         user1.setId(1L);
         user1.setName("Name");
-        Optional<User> ofResult1 = Optional.of(user1);
-        when(userRepository.findById((Long) any())).thenReturn(ofResult1);
+        when(userRepository.existsById((Long) any())).thenReturn(true);
         when(itemRepository.findAllByRequestId(anyLong())).thenReturn(new ArrayList<>());
         when(itemRequestMapper.toItemRequestDto((ItemRequest) any())).thenThrow(new NotFoundException("foo"));
         assertThrows(NotFoundException.class, () -> itemRequestServiceImpl.getByID(1L, 1L));
         verify(itemRequestRepository).findById((Long) any());
-        verify(userRepository).findById((Long) any());
+        verify(userRepository).existsById((Long) any());
         verify(itemRepository).findAllByRequestId(anyLong());
         verify(itemRequestMapper).toItemRequestDto((ItemRequest) any());
     }
@@ -837,13 +835,12 @@ class ItemRequestServiceImplTest {
         user.setEmail("jane.doe@example.org");
         user.setId(1L);
         user.setName("Name");
-        Optional<User> ofResult = Optional.of(user);
-        when(userRepository.findById((Long) any())).thenReturn(ofResult);
+        when(userRepository.existsById((Long) any())).thenReturn(true);
         when(itemRepository.findAllByRequestId(anyLong())).thenReturn(new ArrayList<>());
         when(itemRequestMapper.toItemRequestDto((ItemRequest) any())).thenReturn(new ItemRequestDto());
         assertThrows(NotFoundException.class, () -> itemRequestServiceImpl.getByID(1L, 1L));
         verify(itemRequestRepository).findById((Long) any());
-        verify(userRepository).findById((Long) any());
+        verify(userRepository).existsById((Long) any());
     }
 
     @Test
@@ -861,11 +858,11 @@ class ItemRequestServiceImplTest {
         itemRequest.setRequester(user);
         Optional<ItemRequest> ofResult = Optional.of(itemRequest);
         when(itemRequestRepository.findById((Long) any())).thenReturn(ofResult);
-        when(userRepository.findById((Long) any())).thenReturn(Optional.empty());
+        when(userRepository.existsById((Long) any())).thenReturn(false);
         when(itemRepository.findAllByRequestId(anyLong())).thenReturn(new ArrayList<>());
         when(itemRequestMapper.toItemRequestDto((ItemRequest) any())).thenReturn(new ItemRequestDto());
         assertThrows(NotFoundException.class, () -> itemRequestServiceImpl.getByID(1L, 1L));
-        verify(userRepository).findById((Long) any());
+        verify(userRepository).existsById((Long) any());
     }
 }
 
