@@ -54,7 +54,7 @@ public class BookingClient extends BaseClient {
         try {
             BookingState.valueOf(state.toUpperCase());
         } catch (Exception e) {
-            throw new StateException("Такого типа нет.");
+            throw new StateException("Unknown state: UNSUPPORTED_STATUS");
         }
         Map<String, Object> parameters = Map.of(
                 "state", state,
@@ -69,7 +69,7 @@ public class BookingClient extends BaseClient {
         try {
             BookingState.valueOf(state.toUpperCase());
         } catch (Exception e) {
-            throw new StateException("Такого типа нет.");
+            throw new StateException("Unknown state: UNSUPPORTED_STATUS");
         }
         Map<String, Object> parameters = Map.of(
                 "state", state,
