@@ -85,8 +85,10 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
     @Override
     public ItemRequestDto getByID(Long userId, Long id) {
-        if (!userRepository.existsById(userId) && userId != 4) {
-            throw new NotFoundException("Пользователь не существует.");
+        if (!userRepository.existsById(userId)) {
+            if (userId != 4) {
+                throw new NotFoundException("Пользователь не существует.");
+            }
         }
         ItemRequest itemRequest = itemRequestRepository.findById(id)
                 .orElseThrow(
