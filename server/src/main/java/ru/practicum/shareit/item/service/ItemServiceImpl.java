@@ -110,7 +110,9 @@ public class ItemServiceImpl implements ItemService {
                     .map(commentMapper::toCommentDto)
                     .collect(Collectors.toSet()));
         }
-        return itemPlusDtoList;
+        return itemPlusDtoList.stream()
+                .sorted(Comparator.comparingLong(a -> -a.getId()))
+                .collect(Collectors.toList());
     }
 
     @Transactional
