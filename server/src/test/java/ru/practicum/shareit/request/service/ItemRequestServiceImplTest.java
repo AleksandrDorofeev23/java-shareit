@@ -8,13 +8,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.practicum.shareit.exceptions.NotFoundException;
+import ru.practicum.shareit.exceptions.NotFoundUserException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.request.mapper.ItemRequestMapper;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.model.dto.ItemRequestDto;
 import ru.practicum.shareit.request.repository.ItemRequestRepository;
-import ru.practicum.shareit.request.service.ItemRequestServiceImpl;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
@@ -861,7 +861,7 @@ class ItemRequestServiceImplTest {
         when(userRepository.existsById((Long) any())).thenReturn(false);
         when(itemRepository.findAllByRequestId(anyLong())).thenReturn(new ArrayList<>());
         when(itemRequestMapper.toItemRequestDto((ItemRequest) any())).thenReturn(new ItemRequestDto());
-        assertThrows(NotFoundException.class, () -> itemRequestServiceImpl.getByID(1L, 1L));
+        assertThrows(NotFoundUserException.class, () -> itemRequestServiceImpl.getByID(1L, 1L));
         verify(userRepository).existsById((Long) any());
     }
 }
