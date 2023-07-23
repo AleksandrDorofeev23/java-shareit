@@ -53,6 +53,6 @@ public class ItemRequestClient extends BaseClient {
 
     @Cacheable(CACHE)
     public ResponseEntity<Object> getByID(long userId, long id) {
-        return get("/" + userId, id);
+        return get("/" + id, userId);
     }
 }
