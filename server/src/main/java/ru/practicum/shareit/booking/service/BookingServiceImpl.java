@@ -51,6 +51,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Transactional(readOnly = true)
     @Override
+
     public List<BookingOutDto> getByUser(int from, int size, long id, String stateStr) {
         Pageable pageable = PageRequest.of(from / size, size);
         userMapper.toUser(userService.getById(id));
