@@ -26,6 +26,19 @@ public class ExceptionHandler {
     }
 
     @org.springframework.web.bind.annotation.ExceptionHandler
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Map<String, String> handleNotUserFoundEntity(final NotFoundUserException e) {
+        log.info(e.getMessage());
+        StringBuilder message = new StringBuilder();
+        for (StackTraceElement stackTraceElement : e.getStackTrace()) {
+            message.append(System.lineSeparator()).append(stackTraceElement.toString());
+        }
+        log.info(message.toString());
+        return Map.of("error", "Пользователь не был найден.",
+                "message", e.getMessage());
+    }
+
+    @org.springframework.web.bind.annotation.ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> handleServerError(final ValidException e) {
         log.info(e.getMessage());

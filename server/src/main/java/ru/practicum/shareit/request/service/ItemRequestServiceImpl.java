@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exceptions.NotFoundException;
+import ru.practicum.shareit.exceptions.NotFoundUserException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.request.mapper.ItemRequestMapper;
@@ -85,10 +86,8 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
     @Override
     public ItemRequestDto getByID(Long userId, Long id) {
-        if (!userId.equals(4L)) {
-            if (!userRepository.existsById(userId)) {
-                throw new NotFoundException("Пользователь не существует.");
-            }
+        if (!userRepository.existsById(userId)) {
+            throw new NotFoundUserException("Пользователь не существует.");
         }
         ItemRequest itemRequest = itemRequestRepository.findById(id)
                 .orElseThrow(
