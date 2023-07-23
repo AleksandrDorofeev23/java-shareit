@@ -15,6 +15,7 @@ import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.booking.service.BookingServiceImpl;
 import ru.practicum.shareit.exceptions.AccessException;
 import ru.practicum.shareit.exceptions.DateTimeException;
+import ru.practicum.shareit.exceptions.StateException;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
@@ -272,6 +273,20 @@ class BookingServiceImplTest {
     @Test
     void testGetByUser() {
         when(userService.getById(anyLong())).thenReturn(new UserDto(1L, "Name", "jane.doe@example.org"));
+
+        User user = new User();
+        user.setEmail("jane.doe@example.org");
+        user.setId(1L);
+        user.setName("Name");
+        when(userMapper.toUser((UserDto) any())).thenReturn(user);
+        assertThrows(StateException.class, () -> bookingServiceImpl.getByUser(1, 3, 1L, "MD"));
+        verify(userService).getById(anyLong());
+        verify(userMapper).toUser((UserDto) any());
+    }
+
+    @Test
+    void testGetByUser2() {
+        when(userService.getById(anyLong())).thenReturn(new UserDto(1L, "Name", "jane.doe@example.org"));
         when(userMapper.toUser((UserDto) any())).thenThrow(new AccessException("Такого типа нет."));
         assertThrows(AccessException.class, () -> bookingServiceImpl.getByUser(1, 3, 1L, "MD"));
         verify(userService).getById(anyLong());
@@ -280,6 +295,20 @@ class BookingServiceImplTest {
 
     @Test
     void testGetByOwner() {
+        when(userService.getById(anyLong())).thenReturn(new UserDto(1L, "Name", "jane.doe@example.org"));
+
+        User user = new User();
+        user.setEmail("jane.doe@example.org");
+        user.setId(1L);
+        user.setName("Name");
+        when(userMapper.toUser((UserDto) any())).thenReturn(user);
+        assertThrows(StateException.class, () -> bookingServiceImpl.getByOwner(1, 3, 1L, "MD"));
+        verify(userService).getById(anyLong());
+        verify(userMapper).toUser((UserDto) any());
+    }
+
+    @Test
+    void testGetByOwner2() {
         when(userService.getById(anyLong())).thenReturn(new UserDto(1L, "Name", "jane.doe@example.org"));
         when(userMapper.toUser((UserDto) any())).thenThrow(new AccessException("Такого типа нет."));
         assertThrows(AccessException.class, () -> bookingServiceImpl.getByOwner(1, 3, 1L, "MD"));

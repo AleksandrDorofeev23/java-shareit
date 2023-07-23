@@ -2,7 +2,6 @@ package ru.practicum.shareit.exceptions;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import ru.practicum.shareit.exceptions.*;
 
 import java.io.IOException;
 import java.util.Map;
@@ -104,6 +103,16 @@ class ExceptionHandlerTest {
         assertEquals(2, actualHandleIllegalArgumentExceptionResult.size());
         assertEquals("Некорректный запрос.", actualHandleIllegalArgumentExceptionResult.get("error"));
         assertEquals("error", actualHandleIllegalArgumentExceptionResult.get("message"));
+    }
+
+    @Test
+    void testHandleStateException() {
+        ExceptionHandler exceptionHandler = new ExceptionHandler();
+        Map<String, String> actualHandleStateExceptionResult = exceptionHandler
+                .handleStateException(new StateException("foo"));
+        assertEquals(2, actualHandleStateExceptionResult.size());
+        assertEquals("Unknown state: UNSUPPORTED_STATUS", actualHandleStateExceptionResult.get("error"));
+        assertEquals("foo", actualHandleStateExceptionResult.get("message"));
     }
 
 }

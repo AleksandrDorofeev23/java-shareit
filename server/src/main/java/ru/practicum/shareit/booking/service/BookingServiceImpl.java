@@ -12,10 +12,7 @@ import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.booking.model.dto.BookingInDto;
 import ru.practicum.shareit.booking.model.dto.BookingOutDto;
 import ru.practicum.shareit.booking.repository.BookingRepository;
-import ru.practicum.shareit.exceptions.AccessException;
-import ru.practicum.shareit.exceptions.DateTimeException;
-import ru.practicum.shareit.exceptions.NotAvailableException;
-import ru.practicum.shareit.exceptions.NotFoundException;
+import ru.practicum.shareit.exceptions.*;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
@@ -51,14 +48,18 @@ public class BookingServiceImpl implements BookingService {
 
     @Transactional(readOnly = true)
     @Override
-
     public List<BookingOutDto> getByUser(int from, int size, long id, String stateStr) {
         Pageable pageable = PageRequest.of(from / size, size);
         userMapper.toUser(userService.getById(id));
         LocalDateTime localDateTime = LocalDateTime.now();
         List<Booking> bookingList = new ArrayList<>();
         List<BookingOutDto> bookingOutDtoList = new ArrayList<>();
-        State state = State.valueOf(stateStr.toUpperCase());
+        State state;
+        try {
+            state = State.valueOf(stateStr.toUpperCase());
+        } catch (Exception e) {
+            throw new StateException("Такого типа нет.");
+        }
         switch (state) {
             case ALL:
                 bookingList = bookingRepository.findAllByBookerIdOrderByStartDesc(id, pageable);
@@ -79,8 +80,7 @@ public class BookingServiceImpl implements BookingService {
                 bookingList = bookingRepository.findAllByBookerIdAndStatusOrderByStartDesc(id, Status.REJECTED, pageable);
                 break;
         }
-        for (
-                Booking booking : bookingList) {
+        for (Booking booking : bookingList) {
             bookingOutDtoList.add(bookingMapper.toBookingOutDto(booking));
         }
         return bookingOutDtoList;
@@ -94,7 +94,12 @@ public class BookingServiceImpl implements BookingService {
         LocalDateTime localDateTime = LocalDateTime.now();
         List<Booking> bookingList = new ArrayList<>();
         List<BookingOutDto> bookingOutDtoList = new ArrayList<>();
-        State state = State.valueOf(stateStr.toUpperCase());
+        State state;
+        try {
+            state = State.valueOf(stateStr.toUpperCase());
+        } catch (Exception e) {
+            throw new StateException("Такого типа нет.");
+        }
         switch (state) {
             case ALL:
                 bookingList = bookingRepository.findAllByItemOwnerIdOrderByStartDesc(id, pageable);
