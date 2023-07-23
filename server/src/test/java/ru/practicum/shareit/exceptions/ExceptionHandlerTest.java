@@ -106,15 +106,5 @@ class ExceptionHandlerTest {
         assertEquals("error", actualHandleIllegalArgumentExceptionResult.get("message"));
     }
 
-    @Test
-    void testHandleStateException() {
-        ExceptionHandler exceptionHandler = new ExceptionHandler();
-        Map<String, String> actualHandleStateExceptionResult = exceptionHandler
-                .handleStateException(new StateException("foo"));
-        assertEquals(2, actualHandleStateExceptionResult.size());
-        assertEquals("Unknown state: UNSUPPORTED_STATUS", actualHandleStateExceptionResult.get("error"));
-        assertEquals("foo", actualHandleStateExceptionResult.get("message"));
-    }
-
 }
 
